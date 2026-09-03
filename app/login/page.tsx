@@ -43,30 +43,47 @@ function LoginContent() {
     };
   }, [router, supabase]);
 
-  async function continueWithGoogle() {
-    if (loading) return;
+ async function continueWithGoogle() {
+  if (loading) return;
 
-    setLoading(true);
+  setLoading(true);
 
-    const { error } =
-      await supabase.auth.signInWithOAuth({
-        provider: "google",
-        options: {
-          redirectTo:
-            `${window.location.origin}/api/auth/callback`,
+  const redirect =
+    searchParams.get("redirect") || "/";
 
-          queryParams: {
-            prompt: "select_account",
-          },
+  const safeRedirect =
+    redirect.startsWith("/") &&
+    !redirect.startsWith("//")
+      ? redirect
+      : "/";
+
+  const callbackUrl = new URL(
+    "/api/auth/callback",
+    window.location.origin
+  );
+
+  callbackUrl.searchParams.set(
+    "next",
+    safeRedirect
+  );
+
+  const { error } =
+    await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: {
+        redirectTo: callbackUrl.toString(),
+
+        queryParams: {
+          prompt: "select_account",
         },
-      });
+      },
+    });
 
-    if (error) {
-      console.error(error);
-      setLoading(false);
-    }
+  if (error) {
+    console.error(error);
+    setLoading(false);
   }
-
+}
   const hasError = searchParams.get("error");
 
   /* ================================
