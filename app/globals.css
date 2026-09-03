@@ -671,9 +671,11 @@ header {
 /* Mobile */
 
 @media (max-width: 600px) {
-  .search {
-    display: none;
-  }
+ .search {
+  display: flex;
+  width: 100%;
+  max-width: 100%;
+}
 
   .app {
     padding-top: 10px;
