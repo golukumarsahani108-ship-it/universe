@@ -5,6 +5,7 @@ import {
   useEffect,
   useState,
 } from "react";
+import Link from "next/link";
 import {
   useRouter,
   useSearchParams,
@@ -18,8 +19,10 @@ function LoginContent() {
   const searchParams = useSearchParams();
   const supabase = createClient();
 
-  const [mode, setMode] = useState<Mode>("welcome");
-  const [loading, setLoading] = useState(false);
+  const [mode, setMode] =
+    useState<Mode>("welcome");
+  const [loading, setLoading] =
+    useState(false);
 
   useEffect(() => {
     let mounted = true;
@@ -32,7 +35,16 @@ function LoginContent() {
       if (!mounted) return;
 
       if (session?.user) {
-        router.replace("/me");
+        const redirect =
+          searchParams.get("redirect") || "/me";
+
+        const safeRedirect =
+          redirect.startsWith("/") &&
+          !redirect.startsWith("//")
+            ? redirect
+            : "/me";
+
+        router.replace(safeRedirect);
       }
     }
 
@@ -41,50 +53,52 @@ function LoginContent() {
     return () => {
       mounted = false;
     };
-  }, [router, supabase]);
+  }, [router, supabase, searchParams]);
 
- async function continueWithGoogle() {
-  if (loading) return;
+  async function continueWithGoogle() {
+    if (loading) return;
 
-  setLoading(true);
+    setLoading(true);
 
-  const redirect =
-    searchParams.get("redirect") || "/";
+    const redirect =
+      searchParams.get("redirect") || "/";
 
-  const safeRedirect =
-    redirect.startsWith("/") &&
-    !redirect.startsWith("//")
-      ? redirect
-      : "/";
+    const safeRedirect =
+      redirect.startsWith("/") &&
+      !redirect.startsWith("//")
+        ? redirect
+        : "/";
 
-  const callbackUrl = new URL(
-    "/api/auth/callback",
-    window.location.origin
-  );
+    const callbackUrl = new URL(
+      "/api/auth/callback",
+      window.location.origin
+    );
 
-  callbackUrl.searchParams.set(
-    "next",
-    safeRedirect
-  );
+    callbackUrl.searchParams.set(
+      "next",
+      safeRedirect
+    );
 
-  const { error } =
-    await supabase.auth.signInWithOAuth({
-      provider: "google",
-      options: {
-        redirectTo: callbackUrl.toString(),
+    const { error } =
+      await supabase.auth.signInWithOAuth({
+        provider: "google",
+        options: {
+          redirectTo: callbackUrl.toString(),
 
-        queryParams: {
-          prompt: "select_account",
+          queryParams: {
+            prompt: "select_account",
+          },
         },
-      },
-    });
+      });
 
-  if (error) {
-    console.error(error);
-    setLoading(false);
+    if (error) {
+      console.error(error);
+      setLoading(false);
+    }
   }
-}
-  const hasError = searchParams.get("error");
+
+  const hasError =
+    searchParams.get("error");
 
   /* ================================
      WELCOME
@@ -93,6 +107,14 @@ function LoginContent() {
   if (mode === "welcome") {
     return (
       <main className="auth-page">
+
+        <Link
+          href="/"
+          className="auth-back-home"
+        >
+          ← Back to Home
+        </Link>
+
         <div className="auth-welcome-card">
 
           <div className="auth-welcome-orb">
@@ -118,9 +140,13 @@ function LoginContent() {
           <button
             type="button"
             className="auth-primary-button"
-            onClick={() => setMode("signup")}
+            onClick={() =>
+              setMode("signup")
+            }
           >
-            <span>Create Account</span>
+            <span>
+              Create Account
+            </span>
 
             <span className="auth-arrow">
               →
@@ -130,13 +156,18 @@ function LoginContent() {
           <button
             type="button"
             className="auth-login-link"
-            onClick={() => setMode("login")}
+            onClick={() =>
+              setMode("login")
+            }
           >
             Already have an account?
-            <strong> Sign In</strong>
+            <strong>
+              {" "}Sign In
+            </strong>
           </button>
 
         </div>
+
       </main>
     );
   }
@@ -147,6 +178,13 @@ function LoginContent() {
 
   return (
     <main className="auth-page">
+
+      <Link
+        href="/"
+        className="auth-back-home"
+      >
+        ← Back to Home
+      </Link>
 
       <div
         className={`auth-container ${
@@ -316,7 +354,9 @@ function LoginContent() {
               <button
                 type="button"
                 className="auth-outline-button"
-                onClick={() => setMode("login")}
+                onClick={() =>
+                  setMode("login")
+                }
               >
                 <span>←</span>
                 Sign In
@@ -351,7 +391,9 @@ function LoginContent() {
               <button
                 type="button"
                 className="auth-outline-button"
-                onClick={() => setMode("signup")}
+                onClick={() =>
+                  setMode("signup")
+                }
               >
                 Create Account
                 <span>→</span>
