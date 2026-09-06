@@ -92,6 +92,16 @@ export const defaultFeatures: FeatureConfig[] = [
     items: [],
   },
 
+    {
+    id: "web-creation",
+    name: "Web Creation",
+    icon: "✨",
+    href: "/web-creation",
+    enabled: true,
+    description: "Create and share personalized Universes",
+    items: [],
+  },
+
   {
     id: "birthdays",
     name: "Birthdays",

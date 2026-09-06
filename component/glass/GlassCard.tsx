@@ -1,8 +1,9 @@
 import type { ReactNode } from "react";
 
 type GlassCardProps = {
-  children: ReactNode;
+  children: React.ReactNode;
   className?: string;
+  onClick?: () => void;
 };
 
 export default function GlassCard({
