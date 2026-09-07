@@ -35,6 +35,10 @@ function normalizeSurpriseData(
         ? source.openingMessage
         : DEFAULT_SURPRISE_DATA.openingMessage,
 
+    /* =====================================
+       MEMORIES
+    ===================================== */
+
     memories: {
       ...DEFAULT_SURPRISE_DATA.memories,
       ...(source.memories ?? {}),
@@ -60,6 +64,10 @@ function normalizeSurpriseData(
         : DEFAULT_SURPRISE_DATA.memories.items,
     },
 
+    /* =====================================
+       BIRTHDAY
+    ===================================== */
+
     birthday: {
       ...DEFAULT_SURPRISE_DATA.birthday,
       ...(source.birthday ?? {}),
@@ -80,6 +88,10 @@ function normalizeSurpriseData(
         source.birthday?.forYouText ??
         DEFAULT_SURPRISE_DATA.birthday.forYouText,
     },
+
+    /* =====================================
+       REASONS
+    ===================================== */
 
     reasons: {
       ...DEFAULT_SURPRISE_DATA.reasons,
@@ -102,6 +114,10 @@ function normalizeSurpriseData(
         : DEFAULT_SURPRISE_DATA.reasons.items,
     },
 
+    /* =====================================
+       LETTER
+    ===================================== */
+
     letter: {
       ...DEFAULT_SURPRISE_DATA.letter,
       ...(source.letter ?? {}),
@@ -123,6 +139,10 @@ function normalizeSurpriseData(
         DEFAULT_SURPRISE_DATA.letter.signature,
     },
 
+    /* =====================================
+       PASSWORD
+    ===================================== */
+
     password: {
       ...DEFAULT_SURPRISE_DATA.password,
       ...(source.password ?? {}),
@@ -142,6 +162,10 @@ function normalizeSurpriseData(
           ? source.password.hint
           : DEFAULT_SURPRISE_DATA.password.hint,
     },
+
+    /* =====================================
+       MUSIC
+    ===================================== */
 
     music: {
       ...DEFAULT_SURPRISE_DATA.music,
@@ -172,39 +196,126 @@ function normalizeSurpriseData(
           ? source.music.surpriseMusicPath
           : DEFAULT_SURPRISE_DATA.music.surpriseMusicPath,
     },
+
+    /* =====================================
+       LITTLE COLLECTION
+       IMPORTANT:
+       collection.memories MUST BE PRESERVED
+    ===================================== */
+
+    collection: {
+      ...DEFAULT_SURPRISE_DATA.collection,
+      ...(source.collection ?? {}),
+
+      eyebrow:
+        source.collection?.eyebrow ??
+        DEFAULT_SURPRISE_DATA.collection.eyebrow,
+
+      title:
+        source.collection?.title ??
+        DEFAULT_SURPRISE_DATA.collection.title,
+
+      subtitle:
+        source.collection?.subtitle ??
+        DEFAULT_SURPRISE_DATA.collection.subtitle,
+
+      items: Array.isArray(source.collection?.items)
+        ? source.collection.items
+        : DEFAULT_SURPRISE_DATA.collection.items,
+
+      /*
+       * These are completely separate from
+       * Chapter 01 memories.
+       *
+       * Do NOT replace them with
+       * DEFAULT_SURPRISE_DATA.collection.memories
+       * when uploaded images already exist.
+       */
+      memories: Array.isArray(
+        source.collection?.memories
+      )
+        ? source.collection.memories
+        : DEFAULT_SURPRISE_DATA.collection.memories,
+
+      memoriesText:
+        typeof source.collection?.memoriesText === "string"
+          ? source.collection.memoriesText
+          : DEFAULT_SURPRISE_DATA.collection.memoriesText,
+
+      letterText:
+        typeof source.collection?.letterText === "string"
+          ? source.collection.letterText
+          : DEFAULT_SURPRISE_DATA.collection.letterText,
+
+      flowersText:
+        typeof source.collection?.flowersText === "string"
+          ? source.collection.flowersText
+          : DEFAULT_SURPRISE_DATA.collection.flowersText,
+
+      surpriseText:
+        typeof source.collection?.surpriseText === "string"
+          ? source.collection.surpriseText
+          : DEFAULT_SURPRISE_DATA.collection.surpriseText,
+
+      secretText:
+        typeof source.collection?.secretText === "string"
+          ? source.collection.secretText
+          : DEFAULT_SURPRISE_DATA.collection.secretText,
+
+      musicText:
+        typeof source.collection?.musicText === "string"
+          ? source.collection.musicText
+          : DEFAULT_SURPRISE_DATA.collection.musicText,
+    },
   };
 }
 
 export default function SurprisePreviewPage() {
   const router = useRouter();
 
-  const [data, setData] = useState<SurpriseData | null>(null);
+  const [data, setData] =
+    useState<SurpriseData | null>(null);
 
   useEffect(() => {
-    const saved = localStorage.getItem("my-universe-surprise");
+    const saved =
+      localStorage.getItem(
+        "my-universe-surprise"
+      );
 
     if (!saved) {
-      router.replace("/surprise/customize");
+      router.replace(
+        "/surprise/customize"
+      );
       return;
     }
 
     try {
-      const parsed = JSON.parse(saved);
+      const parsed =
+        JSON.parse(saved);
 
-      const normalized = normalizeSurpriseData(parsed);
+      const normalized =
+        normalizeSurpriseData(
+          parsed
+        );
 
       setData(normalized);
 
-      // Save normalized data so future pages
-      // always receive the complete structure.
+      /*
+       * Save normalized data back.
+       *
+       * This is important because the
+       * Little Collection memories are
+       * preserved here.
+       */
       localStorage.setItem(
         "my-universe-surprise",
         JSON.stringify(normalized)
       );
     } catch {
-      const fallback = normalizeSurpriseData(
-        DEFAULT_SURPRISE_DATA
-      );
+      const fallback =
+        normalizeSurpriseData(
+          DEFAULT_SURPRISE_DATA
+        );
 
       setData(fallback);
 
@@ -242,6 +353,7 @@ export default function SurprisePreviewPage() {
         ===================================== */}
 
         <section className="surprise-preview-welcome glass">
+
           <span>
             A LITTLE SOMETHING
           </span>
@@ -263,6 +375,7 @@ export default function SurprisePreviewPage() {
           <div className="surprise-preview-heart">
             ♡
           </div>
+
         </section>
 
 
@@ -271,6 +384,7 @@ export default function SurprisePreviewPage() {
         ===================================== */}
 
         <section className="surprise-preview-section glass">
+
           <span className="surprise-preview-eyebrow">
             {data.memories.eyebrow}
           </span>
@@ -284,34 +398,107 @@ export default function SurprisePreviewPage() {
           </p>
 
           <div className="surprise-preview-memory-grid">
-            {data.memories.items.map((memory) => (
-              <div
-                key={memory.id}
-                className="surprise-preview-memory glass"
-              >
-                <div className="surprise-preview-image">
-                  {memory.image ? (
-                    <img
-                      src={memory.image}
-                      alt={memory.caption || "Memory"}
-                    />
-                  ) : (
-                    <span>
-                      ♡
-                    </span>
-                  )}
-                </div>
 
-                <p>
-                  {memory.caption}
-                </p>
-              </div>
-            ))}
+            {data.memories.items.map(
+              (memory) => (
+                <div
+                  key={memory.id}
+                  className="surprise-preview-memory glass"
+                >
+
+                  <div className="surprise-preview-image">
+
+                    {memory.image ? (
+                      <img
+                        src={memory.image}
+                        alt={
+                          memory.caption ||
+                          "Memory"
+                        }
+                      />
+                    ) : (
+                      <span>
+                        ♡
+                      </span>
+                    )}
+
+                  </div>
+
+                  <p>
+                    {memory.caption}
+                  </p>
+
+                </div>
+              )
+            )}
+
           </div>
 
           <div className="surprise-preview-bottom">
             {data.memories.bottomText}
           </div>
+
+        </section>
+
+
+        {/* =====================================
+            LITTLE COLLECTION MEMORIES
+            PREVIEW
+        ===================================== */}
+
+        <section className="surprise-preview-section glass">
+
+          <span className="surprise-preview-eyebrow">
+            LITTLE COLLECTION
+          </span>
+
+          <h2>
+            Memories inside the Little Collection ♡
+          </h2>
+
+          <p>
+            These photos are separate from Chapter 01
+            and appear when the recipient opens the
+            Memories icon inside The Little Collection.
+          </p>
+
+          <div className="surprise-preview-memory-grid">
+
+            {data.collection.memories.map(
+              (memory) => (
+                <div
+                  key={memory.id}
+                  className="surprise-preview-memory glass"
+                >
+
+                  <div className="surprise-preview-image">
+
+                    {memory.image ? (
+                      <img
+                        src={memory.image}
+                        alt={
+                          memory.caption ||
+                          "Collection memory"
+                        }
+                      />
+                    ) : (
+                      <span>
+                        ♡
+                      </span>
+                    )}
+
+                  </div>
+
+                  <p>
+                    {memory.caption}
+                  </p>
+
+                </div>
+              )
+            )}
+
+          </div>
+
         </section>
 
 
@@ -320,6 +507,7 @@ export default function SurprisePreviewPage() {
         ===================================== */}
 
         <section className="surprise-preview-section glass">
+
           <span className="surprise-preview-eyebrow">
             {data.birthday.eyebrow}
           </span>
@@ -339,6 +527,7 @@ export default function SurprisePreviewPage() {
           <div className="surprise-preview-for-you glass">
             {data.birthday.forYouText}
           </div>
+
         </section>
 
 
@@ -347,6 +536,7 @@ export default function SurprisePreviewPage() {
         ===================================== */}
 
         <section className="surprise-preview-section glass">
+
           <span className="surprise-preview-eyebrow">
             {data.reasons.eyebrow}
           </span>
@@ -360,21 +550,28 @@ export default function SurprisePreviewPage() {
           </p>
 
           <div className="surprise-preview-reasons">
-            {data.reasons.items.map((reason) => (
-              <div
-                key={reason.id}
-                className="surprise-preview-reason glass"
-              >
-                <h3>
-                  {reason.title}
-                </h3>
 
-                <p>
-                  {reason.text}
-                </p>
-              </div>
-            ))}
+            {data.reasons.items.map(
+              (reason) => (
+                <div
+                  key={reason.id}
+                  className="surprise-preview-reason glass"
+                >
+
+                  <h3>
+                    {reason.title}
+                  </h3>
+
+                  <p>
+                    {reason.text}
+                  </p>
+
+                </div>
+              )
+            )}
+
           </div>
+
         </section>
 
 
@@ -383,6 +580,7 @@ export default function SurprisePreviewPage() {
         ===================================== */}
 
         <section className="surprise-preview-section glass">
+
           <span className="surprise-preview-eyebrow">
             {data.letter.eyebrow}
           </span>
@@ -398,6 +596,7 @@ export default function SurprisePreviewPage() {
           <div className="surprise-preview-signature">
             {data.letter.signature}
           </div>
+
         </section>
 
 
@@ -406,6 +605,7 @@ export default function SurprisePreviewPage() {
         ===================================== */}
 
         <section className="surprise-preview-section glass">
+
           <span className="surprise-preview-eyebrow">
             CHAPTER 05
           </span>
@@ -432,6 +632,7 @@ export default function SurprisePreviewPage() {
                 Hint: {data.password.hint}
               </div>
             )}
+
         </section>
 
 
@@ -440,6 +641,7 @@ export default function SurprisePreviewPage() {
         ===================================== */}
 
         <section className="surprise-preview-section glass">
+
           <span className="surprise-preview-eyebrow">
             MUSIC
           </span>
@@ -459,6 +661,7 @@ export default function SurprisePreviewPage() {
               ? "✓ Surprise music uploaded"
               : "No surprise music"}
           </p>
+
         </section>
 
 
@@ -467,9 +670,12 @@ export default function SurprisePreviewPage() {
         ===================================== */}
 
         <div className="surprise-preview-footer">
+
           <GlassButton
             onClick={() =>
-              router.push("/surprise/customize")
+              router.push(
+                "/surprise/customize"
+              )
             }
           >
             ← Edit
@@ -478,11 +684,14 @@ export default function SurprisePreviewPage() {
           <GlassButton
             active
             onClick={() =>
-              router.push("/surprise/publish")
+              router.push(
+                "/surprise/publish"
+              )
             }
           >
             Publish Surprise ✨
           </GlassButton>
+
         </div>
 
       </div>
