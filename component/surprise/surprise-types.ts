@@ -5,6 +5,12 @@ export type SurpriseMemory = {
   caption: string;
 };
 
+export type SurpriseCollectionItem = {
+  id: string;
+  title: string;
+  subtitle: string;
+};
+
 export type SurpriseData = {
   title: string;
   personName: string;
@@ -56,6 +62,21 @@ export type SurpriseData = {
 
     surpriseMusic: string;
     surpriseMusicPath: string;
+  };
+
+  collection: {
+    eyebrow: string;
+    title: string;
+    subtitle: string;
+
+    items: SurpriseCollectionItem[];
+
+    memoriesText: string;
+    letterText: string;
+    flowersText: string;
+    surpriseText: string;
+    secretText: string;
+    musicText: string;
   };
 };
 
@@ -176,5 +197,65 @@ export const DEFAULT_SURPRISE_DATA: SurpriseData = {
 
     surpriseMusic: "",
     surpriseMusicPath: "",
+  },
+
+  collection: {
+    eyebrow: "A LITTLE COLLECTION",
+
+    title: "Little things for you ♡",
+
+    subtitle:
+      "A few little surprises, made especially for you.",
+
+    items: [
+      {
+        id: "collection-memories",
+        title: "Memories",
+        subtitle: "our little moments",
+      },
+      {
+        id: "collection-letter",
+        title: "Letter",
+        subtitle: "words for you",
+      },
+      {
+        id: "collection-flowers",
+        title: "Flowers",
+        subtitle: "a little bloom",
+      },
+      {
+        id: "collection-surprise",
+        title: "Surprise",
+        subtitle: "something special",
+      },
+      {
+        id: "collection-secret",
+        title: "Secret",
+        subtitle: "psst... don't tell",
+      },
+      {
+        id: "collection-music",
+        title: "Music",
+        subtitle: "a song for you",
+      },
+    ],
+
+    memoriesText:
+      "our little moments",
+
+    letterText:
+      "words for you",
+
+    flowersText:
+      "a little bloom",
+
+    surpriseText:
+      "something special",
+
+    secretText:
+      "psst... don't tell",
+
+    musicText:
+      "a song for you",
   },
 };

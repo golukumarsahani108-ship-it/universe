@@ -163,12 +163,22 @@ export default function SurpriseCustomizer({
     useState<SurpriseData>(() => ({
       ...DEFAULT_SURPRISE_DATA,
 
-      // Always keep exactly 3 image slots.
       memories: {
         ...DEFAULT_SURPRISE_DATA.memories,
         items:
           DEFAULT_SURPRISE_DATA.memories.items
             .slice(0, 3),
+      },
+
+      collection: {
+        ...DEFAULT_SURPRISE_DATA.collection,
+
+        items:
+          DEFAULT_SURPRISE_DATA.collection.items.map(
+            (item) => ({
+              ...item,
+            })
+          ),
       },
     }));
 
@@ -191,6 +201,36 @@ export default function SurpriseCustomizer({
       ...current,
       [key]: value,
     }));
+  };
+
+  /* ================================
+     COLLECTION ITEM UPDATE
+  ================================= */
+
+  const updateCollectionItem = (
+    index: number,
+    value: Partial<
+      SurpriseData["collection"]["items"][number]
+    >
+  ) => {
+    setData((current) => {
+      const items = [
+        ...current.collection.items,
+      ];
+
+      items[index] = {
+        ...items[index],
+        ...value,
+      };
+
+      return {
+        ...current,
+        collection: {
+          ...current.collection,
+          items,
+        },
+      };
+    });
   };
 
   /* ================================
@@ -266,8 +306,6 @@ export default function SurpriseCustomizer({
       );
     } finally {
       setUploading(false);
-
-      // Allow selecting the same file again.
       event.target.value = "";
     }
   };
@@ -433,10 +471,6 @@ export default function SurpriseCustomizer({
   const continueToPreview = () => {
     setError("");
 
-    /*
-     * EXACTLY 3 IMAGES ARE REQUIRED.
-     */
-
     const memories =
       data.memories.items.slice(0, 3);
 
@@ -455,11 +489,6 @@ export default function SurpriseCustomizer({
       return;
     }
 
-    /*
-     * Password must be exactly
-     * 4 digits when enabled.
-     */
-
     if (
       data.password.enabled
     ) {
@@ -477,11 +506,6 @@ export default function SurpriseCustomizer({
       }
     }
 
-    /*
-     * Keep exactly 3 memories.
-     * Everything else stays unchanged.
-     */
-
     const finalData: SurpriseData = {
       ...data,
 
@@ -490,14 +514,6 @@ export default function SurpriseCustomizer({
         items: memories,
       },
     };
-
-    /*
-     * Save only the data required
-     * by the fixed surprise experience.
-     *
-     * Actual files are already in
-     * Supabase Storage.
-     */
 
     localStorage.setItem(
       "my-universe-surprise",
@@ -510,7 +526,9 @@ export default function SurpriseCustomizer({
   return (
     <div className="surprise-customizer">
 
-      {/* BASIC */}
+      {/* =================================
+          BASIC
+      ================================== */}
 
       <GlassCard className="surprise-editor-section">
 
@@ -549,6 +567,7 @@ export default function SurpriseCustomizer({
           />
 
           <label className="surprise-textarea-wrap">
+
             <span>
               Opening message
             </span>
@@ -564,6 +583,7 @@ export default function SurpriseCustomizer({
                 )
               }
             />
+
           </label>
 
         </div>
@@ -571,7 +591,9 @@ export default function SurpriseCustomizer({
       </GlassCard>
 
 
-      {/* MEMORIES — EXACTLY 3 */}
+      {/* =================================
+          MEMORIES
+      ================================== */}
 
       <GlassCard className="surprise-editor-section">
 
@@ -618,6 +640,7 @@ export default function SurpriseCustomizer({
           />
 
           <label className="surprise-textarea-wrap">
+
             <span>
               Intro
             </span>
@@ -637,6 +660,7 @@ export default function SurpriseCustomizer({
                 }))
               }
             />
+
           </label>
 
         </div>
@@ -731,7 +755,9 @@ export default function SurpriseCustomizer({
       </GlassCard>
 
 
-      {/* BIRTHDAY */}
+      {/* =================================
+          BIRTHDAY
+      ================================== */}
 
       <GlassCard className="surprise-editor-section">
 
@@ -778,6 +804,7 @@ export default function SurpriseCustomizer({
           />
 
           <label className="surprise-textarea-wrap">
+
             <span>
               Birthday message
             </span>
@@ -797,6 +824,7 @@ export default function SurpriseCustomizer({
                 }))
               }
             />
+
           </label>
 
           <GlassInput
@@ -821,7 +849,9 @@ export default function SurpriseCustomizer({
       </GlassCard>
 
 
-      {/* REASONS */}
+      {/* =================================
+          REASONS
+      ================================== */}
 
       <GlassCard className="surprise-editor-section">
 
@@ -868,6 +898,7 @@ export default function SurpriseCustomizer({
           />
 
           <label className="surprise-textarea-wrap">
+
             <span>
               Subtitle
             </span>
@@ -887,6 +918,7 @@ export default function SurpriseCustomizer({
                 }))
               }
             />
+
           </label>
 
         </div>
@@ -972,7 +1004,9 @@ export default function SurpriseCustomizer({
       </GlassCard>
 
 
-      {/* LETTER */}
+      {/* =================================
+          LETTER
+      ================================== */}
 
       <GlassCard className="surprise-editor-section">
 
@@ -1063,7 +1097,269 @@ export default function SurpriseCustomizer({
       </GlassCard>
 
 
-      {/* PASSWORD */}
+      {/* =================================
+          LITTLE COLLECTION
+      ================================== */}
+
+      <GlassCard className="surprise-editor-section">
+
+        <span className="surprise-editor-label">
+          LITTLE COLLECTION
+        </span>
+
+        <h2>
+          Six little surprises ✨
+        </h2>
+
+        <p
+          style={{
+            marginBottom: "1.5rem",
+            opacity: 0.75,
+          }}
+        >
+          These six items will appear inside
+          the original Little Collection.
+          Their original icons and interactions
+          stay part of the surprise experience.
+        </p>
+
+        <div className="surprise-editor-fields">
+
+          <GlassInput
+            label="Collection label"
+            value={
+              data.collection.eyebrow
+            }
+            onChange={(value) =>
+              setData((current) => ({
+                ...current,
+                collection: {
+                  ...current.collection,
+                  eyebrow: value,
+                },
+              }))
+            }
+          />
+
+          <GlassInput
+            label="Collection title"
+            value={
+              data.collection.title
+            }
+            onChange={(value) =>
+              setData((current) => ({
+                ...current,
+                collection: {
+                  ...current.collection,
+                  title: value,
+                },
+              }))
+            }
+          />
+
+          <label className="surprise-textarea-wrap">
+
+            <span>
+              Collection subtitle
+            </span>
+
+            <textarea
+              value={
+                data.collection.subtitle
+              }
+              onChange={(event) =>
+                setData((current) => ({
+                  ...current,
+                  collection: {
+                    ...current.collection,
+                    subtitle:
+                      event.target.value,
+                  },
+                }))
+              }
+            />
+
+          </label>
+
+        </div>
+
+
+        <div className="surprise-reasons-editor">
+
+          {data.collection.items
+            .slice(0, 6)
+            .map(
+              (item, index) => (
+                <div
+                  key={item.id}
+                  className="surprise-reason-editor glass"
+                >
+
+                  <span className="surprise-reason-index">
+                    {index + 1}
+                  </span>
+
+                  <GlassInput
+                    label={`Item ${index + 1} title`}
+                    value={
+                      item.title
+                    }
+                    onChange={(value) =>
+                      updateCollectionItem(
+                        index,
+                        {
+                          title: value,
+                        }
+                      )
+                    }
+                  />
+
+                  <GlassInput
+                    label={`Item ${index + 1} subtitle`}
+                    value={
+                      item.subtitle
+                    }
+                    onChange={(value) =>
+                      updateCollectionItem(
+                        index,
+                        {
+                          subtitle:
+                            value,
+                        }
+                      )
+                    }
+                  />
+
+                </div>
+              )
+            )}
+
+        </div>
+
+        <div
+          style={{
+            marginTop: "1.5rem",
+          }}
+        >
+
+          <span className="surprise-editor-label">
+            MINI-SURPRISE TEXT
+          </span>
+
+          <div className="surprise-editor-fields">
+
+            <GlassInput
+              label="Memories text"
+              value={
+                data.collection.memoriesText
+              }
+              onChange={(value) =>
+                setData((current) => ({
+                  ...current,
+                  collection: {
+                    ...current.collection,
+                    memoriesText:
+                      value,
+                  },
+                }))
+              }
+            />
+
+            <GlassInput
+              label="Letter text"
+              value={
+                data.collection.letterText
+              }
+              onChange={(value) =>
+                setData((current) => ({
+                  ...current,
+                  collection: {
+                    ...current.collection,
+                    letterText:
+                      value,
+                  },
+                }))
+              }
+            />
+
+            <GlassInput
+              label="Flowers text"
+              value={
+                data.collection.flowersText
+              }
+              onChange={(value) =>
+                setData((current) => ({
+                  ...current,
+                  collection: {
+                    ...current.collection,
+                    flowersText:
+                      value,
+                  },
+                }))
+              }
+            />
+
+            <GlassInput
+              label="Surprise text"
+              value={
+                data.collection.surpriseText
+              }
+              onChange={(value) =>
+                setData((current) => ({
+                  ...current,
+                  collection: {
+                    ...current.collection,
+                    surpriseText:
+                      value,
+                  },
+                }))
+              }
+            />
+
+            <GlassInput
+              label="Secret text"
+              value={
+                data.collection.secretText
+              }
+              onChange={(value) =>
+                setData((current) => ({
+                  ...current,
+                  collection: {
+                    ...current.collection,
+                    secretText:
+                      value,
+                  },
+                }))
+              }
+            />
+
+            <GlassInput
+              label="Music text"
+              value={
+                data.collection.musicText
+              }
+              onChange={(value) =>
+                setData((current) => ({
+                  ...current,
+                  collection: {
+                    ...current.collection,
+                    musicText:
+                      value,
+                  },
+                }))
+              }
+            />
+
+          </div>
+
+        </div>
+
+      </GlassCard>
+
+
+      {/* =================================
+          PASSWORD
+      ================================== */}
 
       <GlassCard className="surprise-editor-section">
 
@@ -1158,7 +1454,9 @@ export default function SurpriseCustomizer({
       </GlassCard>
 
 
-      {/* MUSIC */}
+      {/* =================================
+          MUSIC
+      ================================== */}
 
       <GlassCard className="surprise-editor-section">
 
@@ -1258,7 +1556,9 @@ export default function SurpriseCustomizer({
       </GlassCard>
 
 
-      {/* STATUS */}
+      {/* =================================
+          STATUS
+      ================================== */}
 
       {uploading && (
         <div className="surprise-upload-status glass">
@@ -1280,7 +1580,9 @@ export default function SurpriseCustomizer({
       )}
 
 
-      {/* FOOTER */}
+      {/* =================================
+          FOOTER
+      ================================== */}
 
       <div className="surprise-builder-footer">
 

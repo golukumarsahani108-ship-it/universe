@@ -1,8 +1,6 @@
 "use client";
 
-import { useState } from "react";
 import { useRouter } from "next/navigation";
-
 import PageShell from "@/component/layout/PageShell";
 import SurpriseCustomizer from "@/component/surprise/SurpriseCustomizer";
 import type { SurpriseData } from "@/component/surprise/surprise-types";
@@ -10,20 +8,15 @@ import type { SurpriseData } from "@/component/surprise/surprise-types";
 export default function SurpriseCustomizePage() {
   const router = useRouter();
 
-  const [surpriseData, setSurpriseData] =
-    useState<SurpriseData | null>(null);
-
   return (
     <PageShell
       title="Customize Surprise"
-      description="Only text, images, password and music can be customized."
-      backHref="/"
-      backLabel="Back to Home"
+      description="The original surprise design stays fixed. You only provide your own content, images, password and music."
+      backHref="/surprise"
+      backLabel="Back to Surprise"
     >
       <SurpriseCustomizer
-        onContinue={(data) => {
-          setSurpriseData(data);
-
+        onContinue={(data: SurpriseData) => {
           localStorage.setItem(
             "my-universe-surprise",
             JSON.stringify(data)
@@ -32,13 +25,6 @@ export default function SurpriseCustomizePage() {
           router.push("/surprise/preview");
         }}
       />
-
-      {surpriseData && (
-        <div className="surprise-save-ready">
-          <span>✓</span>
-          <p>Your surprise is ready for preview.</p>
-        </div>
-      )}
     </PageShell>
   );
 }
