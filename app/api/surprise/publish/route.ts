@@ -17,6 +17,10 @@ export async function POST(request: Request) {
   try {
     const supabase = await createClient();
 
+    // =========================================================
+    // AUTHENTICATION
+    // =========================================================
+
     const {
       data: { user },
       error: authError,
@@ -31,6 +35,10 @@ export async function POST(request: Request) {
       );
     }
 
+    // =========================================================
+    // REQUEST DATA
+    // =========================================================
+
     const body = await request.json();
     const surprise = body?.surprise;
 
@@ -43,6 +51,10 @@ export async function POST(request: Request) {
       );
     }
 
+    // =========================================================
+    // BASIC VALIDATION
+    // =========================================================
+
     if (!surprise.personName?.trim()) {
       return NextResponse.json(
         {
@@ -52,9 +64,19 @@ export async function POST(request: Request) {
       );
     }
 
+    // =========================================================
+    // PASSWORD VALIDATION
+    // =========================================================
+
+    const passwordEnabled = Boolean(
+      surprise.password?.enabled
+    );
+
     if (
-      surprise.password?.enabled &&
-      !/^\d{4}$/.test(surprise.password.code)
+      passwordEnabled &&
+      !/^\d{4}$/.test(
+        String(surprise.password?.code || "")
+      )
     ) {
       return NextResponse.json(
         {
@@ -64,35 +86,45 @@ export async function POST(request: Request) {
       );
     }
 
+    // =========================================================
+    // SLUG
+    // =========================================================
+
     const slug = makeSlug(
       surprise.title || "A Little Surprise For You"
     );
 
-    const passwordEnabled = Boolean(
-      surprise.password?.enabled
-    );
+    // =========================================================
+    // PASSWORD HASH
+    // =========================================================
 
     /*
-     * PASSWORD
+     * IMPORTANT:
      *
-     * Never store the raw password.
-     * The public frontend only receives password_enabled.
+     * Raw password is NEVER stored.
+     * Only the bcrypt hash is saved.
      */
+
     let passwordHash: string | null = null;
 
     if (passwordEnabled) {
       passwordHash = await bcrypt.hash(
-        surprise.password.code,
+        String(surprise.password.code),
         12
       );
     }
 
+    // =========================================================
+    // LITTLE COLLECTION
+    // =========================================================
+
     /*
-     * LITTLE COLLECTION
+     * The six Little Collection items remain part of the
+     * original design.
      *
-     * Keep the original six collection items,
-     * but allow their visible text to be customized.
+     * Creator can customize their visible text.
      */
+
     const collection = surprise.collection || {};
 
     const collectionItems =
@@ -132,14 +164,16 @@ export async function POST(request: Request) {
             },
           ];
 
-    /*
-     * UNIVERSE
-     */
+    // =========================================================
+    // CREATE UNIVERSE
+    // =========================================================
+
     const { data: universe, error: universeError } =
       await supabase
         .from("universes")
         .insert({
           owner_id: user.id,
+
           slug,
 
           title:
@@ -164,22 +198,35 @@ export async function POST(request: Request) {
             style: "blue-white-pink",
           },
 
+          // =====================================================
+          // MUSIC
+          // =====================================================
+
           music: {
             backgroundEnabled:
-              surprise.music?.backgroundEnabled ?? false,
+              surprise.music?.backgroundEnabled ??
+              false,
 
             backgroundMusic:
-              surprise.music?.backgroundMusic || null,
+              surprise.music?.backgroundMusic ||
+              null,
 
             backgroundMusicPath:
-              surprise.music?.backgroundMusicPath || null,
+              surprise.music?.backgroundMusicPath ||
+              null,
 
             surpriseMusic:
-              surprise.music?.surpriseMusic || null,
+              surprise.music?.surpriseMusic ||
+              null,
 
             surpriseMusicPath:
-              surprise.music?.surpriseMusicPath || null,
+              surprise.music?.surpriseMusicPath ||
+              null,
           },
+
+          // =====================================================
+          // PASSWORD
+          // =====================================================
 
           password_enabled: passwordEnabled,
 
@@ -187,7 +234,8 @@ export async function POST(request: Request) {
 
           password_screen: {
             hint:
-              surprise.password?.hint || "",
+              surprise.password?.hint ||
+              "",
           },
 
           published: true,
@@ -211,10 +259,15 @@ export async function POST(request: Request) {
       );
     }
 
-    /*
-     * PAGE 1 — WELCOME
-     */
+    // =========================================================
+    // CREATE PAGES
+    // =========================================================
+
     const pages = [
+      // =======================================================
+      // PAGE 1 — WELCOME
+      // =======================================================
+
       {
         universe_id: universe.id,
         page_order: 1,
@@ -233,9 +286,10 @@ export async function POST(request: Request) {
         },
       },
 
-      /*
-       * PAGE 2 — MEMORIES
-       */
+      // =======================================================
+      // PAGE 2 — CHAPTER 01 MEMORIES
+      // =======================================================
+
       {
         universe_id: universe.id,
         page_order: 2,
@@ -246,7 +300,8 @@ export async function POST(request: Request) {
           "Our little memories ♡",
 
         content:
-          surprise.memories?.intro || "",
+          surprise.memories?.intro ||
+          "",
 
         settings: {
           eyebrow:
@@ -259,9 +314,10 @@ export async function POST(request: Request) {
         },
       },
 
-      /*
-       * PAGE 3 — BIRTHDAY
-       */
+      // =======================================================
+      // PAGE 3 — BIRTHDAY
+      // =======================================================
+
       {
         universe_id: universe.id,
         page_order: 3,
@@ -287,9 +343,10 @@ export async function POST(request: Request) {
         },
       },
 
-      /*
-       * PAGE 4 — REASONS
-       */
+      // =======================================================
+      // PAGE 4 — REASONS
+      // =======================================================
+
       {
         universe_id: universe.id,
         page_order: 4,
@@ -300,7 +357,8 @@ export async function POST(request: Request) {
           "Everything I love about You",
 
         content:
-          surprise.reasons?.subtitle || "",
+          surprise.reasons?.subtitle ||
+          "",
 
         settings: {
           eyebrow:
@@ -308,13 +366,15 @@ export async function POST(request: Request) {
             "CHAPTER 03",
 
           items:
-            surprise.reasons?.items || [],
+            surprise.reasons?.items ||
+            [],
         },
       },
 
-      /*
-       * PAGE 5 — LETTER
-       */
+      // =======================================================
+      // PAGE 5 — LETTER
+      // =======================================================
+
       {
         universe_id: universe.id,
         page_order: 5,
@@ -325,7 +385,8 @@ export async function POST(request: Request) {
           "A little letter just for you",
 
         content:
-          surprise.letter?.content || "",
+          surprise.letter?.content ||
+          "",
 
         settings: {
           eyebrow:
@@ -338,9 +399,10 @@ export async function POST(request: Request) {
         },
       },
 
-      /*
-       * PAGE 6 — PASSWORD
-       */
+      // =======================================================
+      // PAGE 6 — PASSWORD
+      // =======================================================
+
       {
         universe_id: universe.id,
         page_order: 6,
@@ -354,13 +416,15 @@ export async function POST(request: Request) {
           enabled: passwordEnabled,
 
           hint:
-            surprise.password?.hint || "",
+            surprise.password?.hint ||
+            "",
         },
       },
 
-      /*
-       * PAGE 7 — UNLOCK
-       */
+      // =======================================================
+      // PAGE 7 — UNLOCK
+      // =======================================================
+
       {
         universe_id: universe.id,
         page_order: 7,
@@ -373,9 +437,10 @@ export async function POST(request: Request) {
         settings: {},
       },
 
-      /*
-       * PAGE 8 — LITTLE COLLECTION
-       */
+      // =======================================================
+      // PAGE 8 — LITTLE COLLECTION
+      // =======================================================
+
       {
         universe_id: universe.id,
         page_order: 8,
@@ -394,8 +459,10 @@ export async function POST(request: Request) {
             collection.eyebrow ||
             "A LITTLE COLLECTION",
 
+          // Six fixed collection items
           items: collectionItems,
 
+          // Custom text
           memoriesText:
             collection.memoriesText ||
             "our little moments",
@@ -422,9 +489,10 @@ export async function POST(request: Request) {
         },
       },
 
-      /*
-       * PAGE 9 — FINAL
-       */
+      // =======================================================
+      // PAGE 9 — FINAL
+      // =======================================================
+
       {
         universe_id: universe.id,
         page_order: 9,
@@ -437,6 +505,10 @@ export async function POST(request: Request) {
         settings: {},
       },
     ];
+
+    // =========================================================
+    // INSERT PAGES
+    // =========================================================
 
     const { error: pagesError } =
       await supabase
@@ -463,91 +535,54 @@ export async function POST(request: Request) {
       );
     }
 
+    // =========================================================
+    // MEMORY MEDIA
+    // =========================================================
+
     /*
-     * =========================================================
-     * MEMORY MEDIA
-     * =========================================================
-     *
      * IMPORTANT:
      *
-     * 1. surprise.memories.items
-     *    = Chapter 01 Memories
+     * SET 1
+     * surprise.memories.items
+     * = Chapter 01 Memories
      *
-     * 2. surprise.collection.memories
-     *    = Little Collection → Memories
+     * SET 2
+     * surprise.collection.memories
+     * = Little Collection → Memories
      *
-     * These are intentionally stored separately.
+     * They are intentionally stored separately.
      */
 
     const chapterMemoryItems =
-      Array.isArray(surprise.memories?.items)
+      Array.isArray(
+        surprise.memories?.items
+      )
         ? surprise.memories.items
         : [];
 
     const collectionMemoryItems =
-      Array.isArray(collection.memories)
+      Array.isArray(
+        collection.memories
+      )
         ? collection.memories
         : [];
 
-    /*
-     * CHAPTER 01 MEMORY MEDIA
-     */
-    const chapterMemoryRows = chapterMemoryItems
-      .filter(
-        (item: {
-          image?: string;
-          storagePath?: string;
-          caption?: string;
-        }) =>
-          item.image ||
-          item.storagePath
-      )
-      .map(
-        (
-          item: {
-            image?: string;
-            storagePath?: string;
-            caption?: string;
-          },
-          index: number
-        ) => ({
-          universe_id: universe.id,
+    // =========================================================
+    // CHAPTER 01 MEMORY MEDIA
+    // =========================================================
 
-          page_id: null,
-
-          media_type: "image",
-
-          storage_path:
-            item.storagePath || "",
-
-          public_url:
-            item.image || null,
-
-          media_order: index + 1,
-
-          metadata: {
-            caption:
-              item.caption || "",
-
-            source:
-              "chapter-memories",
-          },
-        })
-      );
-
-    /*
-     * LITTLE COLLECTION MEMORY MEDIA
-     */
-    const collectionMemoryRows =
-      collectionMemoryItems
+    const chapterMemoryRows =
+      chapterMemoryItems
         .filter(
           (item: {
             image?: string;
             storagePath?: string;
             caption?: string;
           }) =>
-            item.image ||
-            item.storagePath
+            Boolean(
+              item.image ||
+              item.storagePath
+            )
         )
         .map(
           (
@@ -565,16 +600,74 @@ export async function POST(request: Request) {
             media_type: "image",
 
             storage_path:
-              item.storagePath || "",
+              item.storagePath ||
+              "",
 
             public_url:
-              item.image || null,
+              item.image ||
+              null,
 
-            media_order: index + 1,
+            media_order:
+              index + 1,
 
             metadata: {
               caption:
-                item.caption || "",
+                item.caption ||
+                "",
+
+              source:
+                "chapter-memories",
+            },
+          })
+        );
+
+    // =========================================================
+    // LITTLE COLLECTION → MEMORIES MEDIA
+    // =========================================================
+
+    const collectionMemoryRows =
+      collectionMemoryItems
+        .filter(
+          (item: {
+            image?: string;
+            storagePath?: string;
+            caption?: string;
+          }) =>
+            Boolean(
+              item.image ||
+              item.storagePath
+            )
+        )
+        .map(
+          (
+            item: {
+              image?: string;
+              storagePath?: string;
+              caption?: string;
+            },
+            index: number
+          ) => ({
+            universe_id: universe.id,
+
+            page_id: null,
+
+            media_type: "image",
+
+            storage_path:
+              item.storagePath ||
+              "",
+
+            public_url:
+              item.image ||
+              null,
+
+            media_order:
+              index + 1,
+
+            metadata: {
+              caption:
+                item.caption ||
+                "",
 
               source:
                 "collection-memories",
@@ -582,22 +675,25 @@ export async function POST(request: Request) {
           })
         );
 
-    /*
-     * COMBINE BOTH MEDIA SETS
-     */
+    // =========================================================
+    // COMBINE MEDIA
+    // =========================================================
+
     const mediaRows = [
       ...chapterMemoryRows,
       ...collectionMemoryRows,
     ];
 
-    /*
-     * SAVE MEDIA
-     */
+    // =========================================================
+    // SAVE MEDIA
+    // =========================================================
+
     if (mediaRows.length > 0) {
-      const { error: mediaError } =
-        await supabase
-          .from("universe_media")
-          .insert(mediaRows);
+      const {
+        error: mediaError,
+      } = await supabase
+        .from("universe_media")
+        .insert(mediaRows);
 
       if (mediaError) {
         console.error(
@@ -605,33 +701,43 @@ export async function POST(request: Request) {
           mediaError
         );
 
-        /*
-         * Cleanup universe if media insert fails.
-         */
+        // Cleanup universe.
+        // Related pages/media should be removed by
+        // database cascade if configured.
+
         await supabase
           .from("universes")
           .delete()
-          .eq("id", universe.id)
-          .eq("owner_id", user.id);
+          .eq(
+            "id",
+            universe.id
+          )
+          .eq(
+            "owner_id",
+            user.id
+          );
 
         return NextResponse.json(
           {
-            error: mediaError.message,
+            error:
+              mediaError.message,
           },
           { status: 500 }
         );
       }
     }
 
-    /*
-     * SUCCESS
-     */
+    // =========================================================
+    // SUCCESS
+    // =========================================================
+
     return NextResponse.json({
       success: true,
 
       slug: universe.slug,
 
-      url: `/u/${universe.slug}`,
+      url:
+        `/u/${universe.slug}`,
     });
   } catch (error) {
     console.error(

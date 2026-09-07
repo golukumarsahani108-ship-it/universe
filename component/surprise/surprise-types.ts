@@ -16,11 +16,6 @@ export type SurpriseData = {
   personName: string;
   openingMessage: string;
 
-  /*
-   * CHAPTER 01 MEMORIES
-   * These 3 images are completely separate
-   * from Little Collection → Memories.
-   */
   memories: {
     eyebrow: string;
     title: string;
@@ -64,14 +59,10 @@ export type SurpriseData = {
     backgroundEnabled: boolean;
     backgroundMusic: string;
     backgroundMusicPath: string;
-
     surpriseMusic: string;
     surpriseMusicPath: string;
   };
 
-  /*
-   * LITTLE COLLECTION
-   */
   collection: {
     eyebrow: string;
     title: string;
@@ -79,13 +70,7 @@ export type SurpriseData = {
 
     items: SurpriseCollectionItem[];
 
-    /*
-     * SEPARATE MEMORIES FOR
-     * LITTLE COLLECTION → MEMORIES
-     *
-     * These are NOT connected to
-     * data.memories.items.
-     */
+    // Separate from Chapter 01 memories.
     memories: SurpriseMemory[];
 
     memoriesText: string;
@@ -99,27 +84,17 @@ export type SurpriseData = {
 
 export const DEFAULT_SURPRISE_DATA: SurpriseData = {
   title: "A Little Surprise For You ♡",
-
   personName: "",
-
   openingMessage:
     "There’s a surprise waiting for you.",
 
-  /*
-   * CHAPTER 01
-   * Completely independent 3 images.
-   */
   memories: {
     eyebrow: "CHAPTER 01",
-
     title: "Our little memories ♡",
-
     intro:
       "A few little moments that deserve to stay here forever.",
-
     bottomText:
       "made of tiny moments",
-
     items: [
       {
         id: "memory-1",
@@ -145,25 +120,19 @@ export const DEFAULT_SURPRISE_DATA: SurpriseData = {
   birthday: {
     eyebrow:
       "✦ A LITTLE CELEBRATION ✦",
-
     title:
       "Happy Birthday beautiful ♡",
-
     message:
       "Today is your day, and I hope it brings you countless little reasons to smile.",
-
     forYouText: "FOR YOU",
   },
 
   reasons: {
     eyebrow: "CHAPTER 03",
-
     title:
       "Everything I love about You",
-
     subtitle:
       "A few little reasons, though there are definitely more.",
-
     items: [
       {
         id: "reason-1",
@@ -194,14 +163,12 @@ export const DEFAULT_SURPRISE_DATA: SurpriseData = {
 
   letter: {
     eyebrow: "CHAPTER 04",
-
     title:
       "A little letter just for you",
-
     content:
       "Some things are easier to write than say. So here is a little letter, made especially for you.",
-
-    signature: "With love ♡",
+    signature:
+      "With love ♡",
   },
 
   password: {
@@ -212,21 +179,19 @@ export const DEFAULT_SURPRISE_DATA: SurpriseData = {
 
   music: {
     backgroundEnabled: false,
-
     backgroundMusic: "",
     backgroundMusicPath: "",
-
     surpriseMusic: "",
     surpriseMusicPath: "",
   },
 
   collection: {
-    eyebrow: "A LITTLE COLLECTION",
-
-    title: "Little things for you ♡",
-
+    eyebrow:
+      "THE LITTLE COLLECTION",
+    title:
+      "Pick a little surprise ♡",
     subtitle:
-      "A few little surprises, made especially for you.",
+      "six tiny things, made just for you",
 
     items: [
       {
@@ -261,48 +226,33 @@ export const DEFAULT_SURPRISE_DATA: SurpriseData = {
       },
     ],
 
-    /*
-     * LITTLE COLLECTION → MEMORIES
-     *
-     * Completely separate from Chapter 01.
-     */
     memories: [
       {
         id: "collection-memory-1",
         image: "",
         storagePath: "",
-        caption: "01 a little moment ♡",
+        caption: "01 little moment ♡",
       },
       {
         id: "collection-memory-2",
         image: "",
         storagePath: "",
-        caption: "02 another little moment ✦",
+        caption: "02 little moment ✦",
       },
       {
         id: "collection-memory-3",
         image: "",
         storagePath: "",
-        caption: "03 one more memory ♡",
+        caption: "03 little moment ♡",
       },
     ],
 
     memoriesText:
       "our little moments",
-
-    letterText:
-      "words for you",
-
-    flowersText:
-      "a little bloom",
-
-    surpriseText:
-      "something special",
-
-    secretText:
-      "psst... don't tell",
-
-    musicText:
-      "a song for you",
+    letterText: "words for you",
+    flowersText: "a little bloom",
+    surpriseText: "something special",
+    secretText: "psst... don't tell",
+    musicText: "a song for you",
   },
 };

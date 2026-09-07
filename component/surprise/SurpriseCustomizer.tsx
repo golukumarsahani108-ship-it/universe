@@ -131,10 +131,6 @@ async function uploadFile(
   };
 }
 
-/* ==========================================
-   CHAPTER 01 MEMORY UPDATE
-========================================== */
-
 function updateMemory(
   data: SurpriseData,
   index: number,
@@ -160,9 +156,6 @@ function updateMemory(
   };
 }
 
-/* ==========================================
-   LITTLE COLLECTION MEMORY UPDATE
-========================================== */
 
 function updateCollectionMemory(
   data: SurpriseData,
@@ -171,12 +164,12 @@ function updateCollectionMemory(
     SurpriseData["collection"]["memories"][number]
   >
 ) {
-  const memories = [
+  const items = [
     ...data.collection.memories,
   ];
 
-  memories[index] = {
-    ...memories[index],
+  items[index] = {
+    ...items[index],
     ...value,
   };
 
@@ -184,7 +177,7 @@ function updateCollectionMemory(
     ...data,
     collection: {
       ...data.collection,
-      memories,
+      memories: items,
     },
   };
 }
@@ -196,42 +189,21 @@ export default function SurpriseCustomizer({
     useState<SurpriseData>(() => ({
       ...DEFAULT_SURPRISE_DATA,
 
-      /* ===============================
-         CHAPTER 01 MEMORIES
-      =============================== */
-
+      // Chapter 01 always keeps exactly 3 image slots.
       memories: {
         ...DEFAULT_SURPRISE_DATA.memories,
-
         items:
           DEFAULT_SURPRISE_DATA.memories.items
             .slice(0, 3),
       },
 
-      /* ===============================
-         LITTLE COLLECTION
-      =============================== */
-
+      // Little Collection → Memories also keeps exactly 3
+      // completely separate image slots.
       collection: {
         ...DEFAULT_SURPRISE_DATA.collection,
-
-        items:
-          DEFAULT_SURPRISE_DATA.collection.items.map(
-            (item) => ({
-              ...item,
-            })
-          ),
-
-        /* IMPORTANT:
-           Collection Memories are now
-           completely separate.
-        */
         memories:
-          DEFAULT_SURPRISE_DATA.collection.memories.map(
-            (memory) => ({
-              ...memory,
-            })
-          ),
+          DEFAULT_SURPRISE_DATA.collection.memories
+            .slice(0, 3),
       },
     }));
 
@@ -257,38 +229,7 @@ export default function SurpriseCustomizer({
   };
 
   /* ================================
-     COLLECTION ITEM UPDATE
-  ================================= */
-
-  const updateCollectionItem = (
-    index: number,
-    value: Partial<
-      SurpriseData["collection"]["items"][number]
-    >
-  ) => {
-    setData((current) => {
-      const items = [
-        ...current.collection.items,
-      ];
-
-      items[index] = {
-        ...items[index],
-        ...value,
-      };
-
-      return {
-        ...current,
-        collection: {
-          ...current.collection,
-          items,
-        },
-      };
-    });
-  };
-
-  /* ================================
-     CHAPTER 01 MEMORY IMAGE UPLOAD
-     COMPLETELY SEPARATE
+     IMAGE UPLOAD — EXACTLY 3
   ================================= */
 
   const handleMemoryImage = async (
@@ -305,7 +246,7 @@ export default function SurpriseCustomizer({
       setUploading(true);
 
       setUploadStatus(
-        `Uploading Chapter 01 image ${index + 1} of 3...`
+        `Uploading image ${index + 1} of 3...`
       );
 
       const supabase =
@@ -333,7 +274,7 @@ export default function SurpriseCustomizer({
           file,
           user.id,
           "image",
-          `chapter-memory-${index + 1}`
+          `memory-${index + 1}`
         );
 
       setData((current) =>
@@ -343,7 +284,6 @@ export default function SurpriseCustomizer({
           {
             image:
               uploaded.publicUrl,
-
             storagePath:
               uploaded.storagePath,
           }
@@ -351,7 +291,7 @@ export default function SurpriseCustomizer({
       );
 
       setUploadStatus(
-        `Chapter 01 image ${index + 1} uploaded ✓`
+        `Image ${index + 1} uploaded ✓`
       );
     } catch (err) {
       setError(
@@ -361,89 +301,89 @@ export default function SurpriseCustomizer({
       );
     } finally {
       setUploading(false);
+
+      // Allow selecting the same file again.
       event.target.value = "";
     }
   };
 
   /* ================================
-     LITTLE COLLECTION MEMORY IMAGE
-     COMPLETELY SEPARATE
+     LITTLE COLLECTION → MEMORIES
+     SEPARATE 3 IMAGE SLOTS
   ================================= */
 
-  const handleCollectionMemoryImage =
-    async (
-      event: ChangeEvent<HTMLInputElement>,
-      index: number
-    ) => {
-      const file =
-        event.target.files?.[0];
+  const handleCollectionMemoryImage = async (
+    event: ChangeEvent<HTMLInputElement>,
+    index: number
+  ) => {
+    const file =
+      event.target.files?.[0];
 
-      if (!file) return;
+    if (!file) return;
 
-      try {
-        setError("");
-        setUploading(true);
+    try {
+      setError("");
+      setUploading(true);
 
-        setUploadStatus(
-          `Uploading Collection Memories image ${index + 1} of 3...`
+      setUploadStatus(
+        `Uploading collection memory ${index + 1} of 3...`
+      );
+
+      const supabase =
+        createClient();
+
+      const {
+        data: {
+          user,
+        },
+        error: userError,
+      } =
+        await supabase.auth.getUser();
+
+      if (
+        userError ||
+        !user
+      ) {
+        throw new Error(
+          "Please login before uploading files."
         );
-
-        const supabase =
-          createClient();
-
-        const {
-          data: {
-            user,
-          },
-          error: userError,
-        } =
-          await supabase.auth.getUser();
-
-        if (
-          userError ||
-          !user
-        ) {
-          throw new Error(
-            "Please login before uploading files."
-          );
-        }
-
-        const uploaded =
-          await uploadFile(
-            file,
-            user.id,
-            "image",
-            `collection-memory-${index + 1}`
-          );
-
-        setData((current) =>
-          updateCollectionMemory(
-            current,
-            index,
-            {
-              image:
-                uploaded.publicUrl,
-
-              storagePath:
-                uploaded.storagePath,
-            }
-          )
-        );
-
-        setUploadStatus(
-          `Collection Memories image ${index + 1} uploaded ✓`
-        );
-      } catch (err) {
-        setError(
-          err instanceof Error
-            ? err.message
-            : "Collection image upload failed."
-        );
-      } finally {
-        setUploading(false);
-        event.target.value = "";
       }
-    };
+
+      const uploaded =
+        await uploadFile(
+          file,
+          user.id,
+          "image",
+          `collection-memory-${index + 1}`
+        );
+
+      setData((current) =>
+        updateCollectionMemory(
+          current,
+          index,
+          {
+            image:
+              uploaded.publicUrl,
+            storagePath:
+              uploaded.storagePath,
+          }
+        )
+      );
+
+      setUploadStatus(
+        `Collection memory ${index + 1} uploaded ✓`
+      );
+    } catch (err) {
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Collection memory upload failed."
+      );
+    } finally {
+      setUploading(false);
+      event.target.value = "";
+    }
+  };
 
   /* ================================
      BACKGROUND MUSIC
@@ -496,7 +436,6 @@ export default function SurpriseCustomizer({
 
         setData((current) => ({
           ...current,
-
           music: {
             ...current.music,
 
@@ -574,7 +513,6 @@ export default function SurpriseCustomizer({
 
         setData((current) => ({
           ...current,
-
           music: {
             ...current.music,
 
@@ -608,16 +546,18 @@ export default function SurpriseCustomizer({
   const continueToPreview = () => {
     setError("");
 
-    /* ===============================
-       CHAPTER 01 IMAGES
-    =============================== */
+    /*
+     * EXACTLY 3 IMAGES ARE REQUIRED.
+     */
 
-    const chapterMemories =
-      data.memories.items
-        .slice(0, 3);
+    const memories =
+      data.memories.items.slice(0, 3);
+
+    const collectionMemories =
+      data.collection.memories.slice(0, 3);
 
     const missingChapterImage =
-      chapterMemories.some(
+      memories.some(
         (memory) =>
           !memory.image ||
           !memory.storagePath
@@ -631,14 +571,6 @@ export default function SurpriseCustomizer({
       return;
     }
 
-    /* ===============================
-       COLLECTION MEMORIES IMAGES
-    =============================== */
-
-    const collectionMemories =
-      data.collection.memories
-        .slice(0, 3);
-
     const missingCollectionImage =
       collectionMemories.some(
         (memory) =>
@@ -648,15 +580,16 @@ export default function SurpriseCustomizer({
 
     if (missingCollectionImage) {
       setError(
-        "Please upload all 3 Little Collection → Memories images before continuing."
+        "Please upload all 3 Little Collection memory images before continuing."
       );
 
       return;
     }
 
-    /* ===============================
-       PASSWORD
-    =============================== */
+    /*
+     * Password must be exactly
+     * 4 digits when enabled.
+     */
 
     if (
       data.password.enabled
@@ -675,27 +608,32 @@ export default function SurpriseCustomizer({
       }
     }
 
-    /* ===============================
-       FINAL DATA
-    =============================== */
+    /*
+     * Keep exactly 3 memories.
+     * Everything else stays unchanged.
+     */
 
     const finalData: SurpriseData = {
       ...data,
 
       memories: {
         ...data.memories,
-
-        items:
-          chapterMemories,
+        items: memories,
       },
 
       collection: {
         ...data.collection,
-
-        memories:
-          collectionMemories,
+        memories: collectionMemories,
       },
     };
+
+    /*
+     * Save only the data required
+     * by the fixed surprise experience.
+     *
+     * Actual files are already in
+     * Supabase Storage.
+     */
 
     localStorage.setItem(
       "my-universe-surprise",
@@ -708,9 +646,7 @@ export default function SurpriseCustomizer({
   return (
     <div className="surprise-customizer">
 
-      {/* =================================
-          BASIC
-      ================================== */}
+      {/* BASIC */}
 
       <GlassCard className="surprise-editor-section">
 
@@ -749,7 +685,6 @@ export default function SurpriseCustomizer({
           />
 
           <label className="surprise-textarea-wrap">
-
             <span>
               Opening message
             </span>
@@ -765,7 +700,6 @@ export default function SurpriseCustomizer({
                 )
               }
             />
-
           </label>
 
         </div>
@@ -773,9 +707,7 @@ export default function SurpriseCustomizer({
       </GlassCard>
 
 
-      {/* =================================
-          CHAPTER 01 MEMORIES
-      ================================== */}
+      {/* MEMORIES — EXACTLY 3 */}
 
       <GlassCard className="surprise-editor-section">
 
@@ -822,7 +754,6 @@ export default function SurpriseCustomizer({
           />
 
           <label className="surprise-textarea-wrap">
-
             <span>
               Intro
             </span>
@@ -842,7 +773,6 @@ export default function SurpriseCustomizer({
                 }))
               }
             />
-
           </label>
 
         </div>
@@ -862,10 +792,7 @@ export default function SurpriseCustomizer({
                   <div className="surprise-memory-number">
                     {String(
                       index + 1
-                    ).padStart(
-                      2,
-                      "0"
-                    )}
+                    ).padStart(2, "0")}
                   </div>
 
                   <div className="surprise-memory-upload">
@@ -940,9 +867,97 @@ export default function SurpriseCustomizer({
       </GlassCard>
 
 
-      {/* =================================
-          BIRTHDAY
-      ================================== */}
+      {/* LITTLE COLLECTION → MEMORIES */}
+
+      <GlassCard className="surprise-editor-section">
+
+        <span className="surprise-editor-label">
+          LITTLE COLLECTION
+        </span>
+
+        <h2>
+          Memories inside the Little Collection ♡
+        </h2>
+
+        <p className="surprise-editor-help">
+          These 3 photos are completely separate from Chapter 01 Memories.
+          They will open only when the recipient taps the Memories icon
+          inside The Little Collection.
+        </p>
+
+        <div className="surprise-memory-editor-grid">
+
+          {data.collection.memories
+            .slice(0, 3)
+            .map(
+              (memory, index) => (
+                <div
+                  key={memory.id}
+                  className="surprise-memory-editor glass"
+                >
+
+                  <div className="surprise-memory-number">
+                    {String(
+                      index + 1
+                    ).padStart(2, "0")}
+                  </div>
+
+                  <div className="surprise-memory-upload">
+
+                    {memory.image ? (
+                      <img
+                        src={
+                          memory.image
+                        }
+                        alt=""
+                      />
+                    ) : (
+                      <span>＋</span>
+                    )}
+
+                    <input
+                      type="file"
+                      accept="image/*"
+                      disabled={uploading}
+                      onChange={(event) =>
+                        handleCollectionMemoryImage(
+                          event,
+                          index
+                        )
+                      }
+                    />
+
+                  </div>
+
+                  <GlassInput
+                    label="Caption"
+                    value={
+                      memory.caption
+                    }
+                    onChange={(value) =>
+                      setData((current) =>
+                        updateCollectionMemory(
+                          current,
+                          index,
+                          {
+                            caption:
+                              value,
+                          }
+                        )
+                      )
+                    }
+                  />
+
+                </div>
+              )
+            )}
+
+        </div>
+
+      </GlassCard>
+
+
+      {/* BIRTHDAY */}
 
       <GlassCard className="surprise-editor-section">
 
@@ -989,7 +1004,6 @@ export default function SurpriseCustomizer({
           />
 
           <label className="surprise-textarea-wrap">
-
             <span>
               Birthday message
             </span>
@@ -1009,7 +1023,6 @@ export default function SurpriseCustomizer({
                 }))
               }
             />
-
           </label>
 
           <GlassInput
@@ -1034,9 +1047,7 @@ export default function SurpriseCustomizer({
       </GlassCard>
 
 
-      {/* =================================
-          REASONS
-      ================================== */}
+      {/* REASONS */}
 
       <GlassCard className="surprise-editor-section">
 
@@ -1083,7 +1094,6 @@ export default function SurpriseCustomizer({
           />
 
           <label className="surprise-textarea-wrap">
-
             <span>
               Subtitle
             </span>
@@ -1103,7 +1113,6 @@ export default function SurpriseCustomizer({
                 }))
               }
             />
-
           </label>
 
         </div>
@@ -1189,9 +1198,7 @@ export default function SurpriseCustomizer({
       </GlassCard>
 
 
-      {/* =================================
-          LETTER
-      ================================== */}
+      {/* LETTER */}
 
       <GlassCard className="surprise-editor-section">
 
@@ -1282,406 +1289,7 @@ export default function SurpriseCustomizer({
       </GlassCard>
 
 
-      {/* =================================
-          LITTLE COLLECTION
-      ================================== */}
-
-      <GlassCard className="surprise-editor-section">
-
-        <span className="surprise-editor-label">
-          LITTLE COLLECTION
-        </span>
-
-        <h2>
-          Six little surprises ✨
-        </h2>
-
-        <p
-          style={{
-            marginBottom: "1.5rem",
-            opacity: 0.75,
-          }}
-        >
-          These six items will appear inside
-          the original Little Collection.
-          Their original icons and interactions
-          stay part of the surprise experience.
-        </p>
-
-        <div className="surprise-editor-fields">
-
-          <GlassInput
-            label="Collection label"
-            value={
-              data.collection.eyebrow
-            }
-            onChange={(value) =>
-              setData((current) => ({
-                ...current,
-                collection: {
-                  ...current.collection,
-                  eyebrow: value,
-                },
-              }))
-            }
-          />
-
-          <GlassInput
-            label="Collection title"
-            value={
-              data.collection.title
-            }
-            onChange={(value) =>
-              setData((current) => ({
-                ...current,
-                collection: {
-                  ...current.collection,
-                  title: value,
-                },
-              }))
-            }
-          />
-
-          <label className="surprise-textarea-wrap">
-
-            <span>
-              Collection subtitle
-            </span>
-
-            <textarea
-              value={
-                data.collection.subtitle
-              }
-              onChange={(event) =>
-                setData((current) => ({
-                  ...current,
-                  collection: {
-                    ...current.collection,
-                    subtitle:
-                      event.target.value,
-                  },
-                }))
-              }
-            />
-
-          </label>
-
-        </div>
-
-
-        {/* =================================
-            COLLECTION ITEMS
-        ================================== */}
-
-        <div className="surprise-reasons-editor">
-
-          {data.collection.items
-            .slice(0, 6)
-            .map(
-              (item, index) => (
-                <div
-                  key={item.id}
-                  className="surprise-reason-editor glass"
-                >
-
-                  <span className="surprise-reason-index">
-                    {index + 1}
-                  </span>
-
-                  <GlassInput
-                    label={`Item ${index + 1} title`}
-                    value={
-                      item.title
-                    }
-                    onChange={(value) =>
-                      updateCollectionItem(
-                        index,
-                        {
-                          title: value,
-                        }
-                      )
-                    }
-                  />
-
-                  <GlassInput
-                    label={`Item ${index + 1} subtitle`}
-                    value={
-                      item.subtitle
-                    }
-                    onChange={(value) =>
-                      updateCollectionItem(
-                        index,
-                        {
-                          subtitle:
-                            value,
-                        }
-                      )
-                    }
-                  />
-
-                </div>
-              )
-            )}
-
-        </div>
-
-
-        {/* =================================
-            COLLECTION MEMORIES
-            COMPLETELY SEPARATE FROM
-            CHAPTER 01 MEMORIES
-        ================================== */}
-
-        <div
-          style={{
-            marginTop: "2rem",
-            width: "100%",
-          }}
-        >
-
-          <span className="surprise-editor-label">
-            COLLECTION → MEMORIES PHOTOS
-          </span>
-
-          <h3
-            style={{
-              marginTop: "0.5rem",
-              marginBottom: "0.5rem",
-            }}
-          >
-            Memories inside Little Collection ♡
-          </h3>
-
-          <p
-            style={{
-              marginTop: "0.5rem",
-              marginBottom: "1rem",
-              opacity: 0.7,
-              fontSize: "0.9rem",
-            }}
-          >
-            These 3 photos are completely separate
-            from the Chapter 01 memories above.
-            You can upload different photos here.
-          </p>
-
-          <div className="surprise-memory-editor-grid">
-
-            {data.collection.memories
-              .slice(0, 3)
-              .map(
-                (
-                  memory,
-                  index
-                ) => (
-                  <div
-                    key={memory.id}
-                    className="surprise-memory-editor glass"
-                  >
-
-                    <div className="surprise-memory-number">
-                      {String(
-                        index + 1
-                      ).padStart(
-                        2,
-                        "0"
-                      )}
-                    </div>
-
-                    <div className="surprise-memory-upload">
-
-                      {memory.image ? (
-                        <img
-                          src={
-                            memory.image
-                          }
-                          alt=""
-                        />
-                      ) : (
-                        <span>
-                          ＋
-                        </span>
-                      )}
-
-                      <input
-                        type="file"
-                        accept="image/*"
-                        disabled={
-                          uploading
-                        }
-                        onChange={(
-                          event
-                        ) =>
-                          handleCollectionMemoryImage(
-                            event,
-                            index
-                          )
-                        }
-                      />
-
-                    </div>
-
-                    <GlassInput
-                      label="Caption"
-                      value={
-                        memory.caption
-                      }
-                      onChange={(
-                        value
-                      ) =>
-                        setData(
-                          (
-                            current
-                          ) =>
-                            updateCollectionMemory(
-                              current,
-                              index,
-                              {
-                                caption:
-                                  value,
-                              }
-                            )
-                        )
-                      }
-                    />
-
-                  </div>
-                )
-              )}
-
-          </div>
-
-        </div>
-
-
-        {/* =================================
-            MINI SURPRISE TEXT
-        ================================== */}
-
-        <div
-          style={{
-            marginTop: "1.5rem",
-          }}
-        >
-
-          <span className="surprise-editor-label">
-            MINI-SURPRISE TEXT
-          </span>
-
-          <div className="surprise-editor-fields">
-
-            <GlassInput
-              label="Memories text"
-              value={
-                data.collection.memoriesText
-              }
-              onChange={(value) =>
-                setData((current) => ({
-                  ...current,
-                  collection: {
-                    ...current.collection,
-                    memoriesText:
-                      value,
-                  },
-                }))
-              }
-            />
-
-            <GlassInput
-              label="Letter text"
-              value={
-                data.collection.letterText
-              }
-              onChange={(value) =>
-                setData((current) => ({
-                  ...current,
-                  collection: {
-                    ...current.collection,
-                    letterText:
-                      value,
-                  },
-                }))
-              }
-            />
-
-            <GlassInput
-              label="Flowers text"
-              value={
-                data.collection.flowersText
-              }
-              onChange={(value) =>
-                setData((current) => ({
-                  ...current,
-                  collection: {
-                    ...current.collection,
-                    flowersText:
-                      value,
-                  },
-                }))
-              }
-            />
-
-            <GlassInput
-              label="Surprise text"
-              value={
-                data.collection.surpriseText
-              }
-              onChange={(value) =>
-                setData((current) => ({
-                  ...current,
-                  collection: {
-                    ...current.collection,
-                    surpriseText:
-                      value,
-                  },
-                }))
-              }
-            />
-
-            <GlassInput
-              label="Secret text"
-              value={
-                data.collection.secretText
-              }
-              onChange={(value) =>
-                setData((current) => ({
-                  ...current,
-                  collection: {
-                    ...current.collection,
-                    secretText:
-                      value,
-                  },
-                }))
-              }
-            />
-
-            <GlassInput
-              label="Music text"
-              value={
-                data.collection.musicText
-              }
-              onChange={(value) =>
-                setData((current) => ({
-                  ...current,
-                  collection: {
-                    ...current.collection,
-                    musicText:
-                      value,
-                  },
-                }))
-              }
-            />
-
-          </div>
-
-        </div>
-
-      </GlassCard>
-
-
-      {/* =================================
-          PASSWORD
-      ================================== */}
+      {/* PASSWORD */}
 
       <GlassCard className="surprise-editor-section">
 
@@ -1776,9 +1384,7 @@ export default function SurpriseCustomizer({
       </GlassCard>
 
 
-      {/* =================================
-          MUSIC
-      ================================== */}
+      {/* MUSIC */}
 
       <GlassCard className="surprise-editor-section">
 
@@ -1878,9 +1484,7 @@ export default function SurpriseCustomizer({
       </GlassCard>
 
 
-      {/* =================================
-          STATUS
-      ================================== */}
+      {/* STATUS */}
 
       {uploading && (
         <div className="surprise-upload-status glass">
@@ -1902,9 +1506,7 @@ export default function SurpriseCustomizer({
       )}
 
 
-      {/* =================================
-          FOOTER
-      ================================== */}
+      {/* FOOTER */}
 
       <div className="surprise-builder-footer">
 
