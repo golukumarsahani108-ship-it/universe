@@ -28,7 +28,11 @@ document.addEventListener("DOMContentLoaded", async () => {
 
       return await response.json();
     } catch (error) {
-      console.error("Could not load surprise data:", error);
+      console.error(
+        "Could not load surprise data:",
+        error
+      );
+
       return null;
     }
   }
@@ -78,10 +82,15 @@ document.addEventListener("DOMContentLoaded", async () => {
     );
   }
 
-  function setting(pageObject, key, fallback = "") {
+  function setting(
+    pageObject,
+    key,
+    fallback = ""
+  ) {
     const value = pageObject?.settings?.[key];
 
-    return value === undefined || value === null
+    return value === undefined ||
+      value === null
       ? fallback
       : value;
   }
@@ -108,9 +117,11 @@ document.addEventListener("DOMContentLoaded", async () => {
       return;
     }
 
-    document.querySelectorAll(selector).forEach((el) => {
-      el.textContent = String(value);
-    });
+    document
+      .querySelectorAll(selector)
+      .forEach((el) => {
+        el.textContent = String(value);
+      });
   }
 
   function setHTML(selector, value) {
@@ -144,7 +155,11 @@ document.addEventListener("DOMContentLoaded", async () => {
       .map((x) => x.trim())
       .filter(Boolean);
 
-    el.innerHTML = (blocks.length ? blocks : [String(value)])
+    el.innerHTML = (
+      blocks.length
+        ? blocks
+        : [String(value)]
+    )
       .map(
         (x) =>
           `<p>${escapeHtml(x).replace(
@@ -161,24 +176,26 @@ document.addEventListener("DOMContentLoaded", async () => {
     firstFallback,
     secondFallback
   ) {
-    const heading = document.querySelector(selector);
+    const heading =
+      document.querySelector(selector);
 
     if (!heading) return;
 
     const text = String(value || "");
 
-    const parts = text.split(
-      /\r?\n|<br\s*\/?>/i
-    );
+    const parts = text
+      .split(/\r?\n|<br\s*\/?>/i);
 
     const first =
-      parts[0]?.trim() || firstFallback;
+      parts[0]?.trim() ||
+      firstFallback;
 
     const second =
       parts
         .slice(1)
         .join(" ")
-        .trim() || secondFallback;
+        .trim() ||
+      secondFallback;
 
     heading.innerHTML = `
       ${escapeHtml(first)}
@@ -191,21 +208,31 @@ document.addEventListener("DOMContentLoaded", async () => {
   ========================================= */
 
   function applyDynamicContent() {
-    const universe = universeData.universe || {};
+    const universe =
+      universeData.universe || {};
 
-    const memories = page("memories");
-    const birthday = page("birthday");
-    const reasons = page("reasons");
-    const letter = page("letter");
-    const password = page("password");
+    const memories =
+      page("memories");
+
+    const birthday =
+      page("birthday");
+
+    const reasons =
+      page("reasons");
+
+    const letter =
+      page("letter");
+
+    const password =
+      page("password");
 
     /*
-      IMPORTANT:
-      Collection data is saved inside the
-      "surprises" page settings by the publish API.
+      Collection data is stored inside
+      page_type = "surprises"
     */
 
-    const collectionPage = page("surprises");
+    const collectionPage =
+      page("surprises");
 
     const collection =
       collectionPage?.settings || {};
@@ -267,45 +294,58 @@ document.addEventListener("DOMContentLoaded", async () => {
       )
     );
 
-    const memoryMedia = (universeData.media || [])
-      .filter(
-        (x) =>
-          String(x.media_type || "").toLowerCase() ===
-          "image"
-      )
-      .sort(
-        (a, b) =>
-          (a.media_order || 0) -
-          (b.media_order || 0)
-      )
-      .slice(0, 3);
+    const memoryMedia =
+      (universeData.media || [])
+        .filter(
+          (x) =>
+            String(
+              x.media_type || ""
+            ).toLowerCase() ===
+            "image"
+        )
+        .sort(
+          (a, b) =>
+            (a.media_order || 0) -
+            (b.media_order || 0)
+        )
+        .slice(0, 3);
 
     document
       .querySelectorAll(".memory-photo")
-      .forEach((card, index) => {
-        const item = memoryMedia[index];
+      .forEach(
+        (card, index) => {
+          const item =
+            memoryMedia[index];
 
-        if (!item) return;
+          if (!item) return;
 
-        const img = card.querySelector("img");
+          const img =
+            card.querySelector("img");
 
-        const caption =
-          card.querySelector(".photo-caption");
+          const caption =
+            card.querySelector(
+              ".photo-caption"
+            );
 
-        if (img && item.public_url) {
-          img.src = item.public_url;
+          if (
+            img &&
+            item.public_url
+          ) {
+            img.src =
+              item.public_url;
+          }
+
+          if (caption) {
+            caption.innerHTML = `
+              <span>0${index + 1}</span>
+              ${escapeHtml(
+                item.metadata?.caption ||
+                  `memory ${index + 1} ♡`
+              )}
+            `;
+          }
         }
-
-        if (caption) {
-          caption.innerHTML = `
-            <span>0${index + 1}</span>
-            ${escapeHtml(
-              item.metadata?.caption ||
-                `memory ${index + 1} ♡`
-            )}
-          `;
-        }
-      });
+      );
 
     /* =========================================
        BIRTHDAY
@@ -340,7 +380,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     );
 
     /* =========================================
-       REASONS / FAVOURITE PERSON
+       REASONS
     ========================================= */
 
     const reasonItems =
@@ -352,33 +392,38 @@ document.addEventListener("DOMContentLoaded", async () => {
     ) {
       document
         .querySelectorAll(".love-card")
-        .forEach((card, index) => {
-          const item = reasonItems[index];
+        .forEach(
+          (card, index) => {
+            const item =
+              reasonItems[index];
 
-          if (!item) {
-            card.style.display = "none";
-            return;
+            if (!item) {
+              card.style.display =
+                "none";
+
+              return;
+            }
+
+            const title =
+              card.querySelector("h3");
+
+            const text =
+              card.querySelector("p");
+
+            if (title) {
+              title.textContent =
+                item.title ||
+                "Something special";
+            }
+
+            if (text) {
+              text.textContent =
+                item.text ||
+                item.description ||
+                "";
+            }
           }
-
-          const title =
-            card.querySelector("h3");
-
-          const text =
-            card.querySelector("p");
-
-          if (title) {
-            title.textContent =
-              item.title ||
-              "Something special";
-          }
-
-          if (text) {
-            text.textContent =
-              item.text ||
-              item.description ||
-              "";
-          }
-        });
+        );
     }
 
     setText(
@@ -438,17 +483,6 @@ document.addEventListener("DOMContentLoaded", async () => {
        LITTLE COLLECTION
     ========================================= */
 
-    /*
-      IMPORTANT:
-      Collection title + subtitle are stored in:
-
-      page_type = "surprises"
-
-      title    -> collection title
-      content  -> collection subtitle
-      settings -> collection settings
-    */
-
     const collectionEyebrow =
       collection.eyebrow ||
       "A LITTLE COLLECTION";
@@ -475,17 +509,6 @@ document.addEventListener("DOMContentLoaded", async () => {
       collectionEyebrow
     );
 
-    /*
-      IMPORTANT:
-      Original HTML has:
-
-      .surprises-heading h1
-      .surprises-heading p
-
-      We should NOT replace the whole h1,
-      because the original <span> design must remain.
-    */
-
     const surprisesHeading =
       document.querySelector(
         "#surprisesPage .surprises-heading h1"
@@ -493,7 +516,9 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     if (surprisesHeading) {
       const span =
-        surprisesHeading.querySelector("span");
+        surprisesHeading.querySelector(
+          "span"
+        );
 
       if (span) {
         const titleParts =
@@ -502,18 +527,24 @@ document.addEventListener("DOMContentLoaded", async () => {
             .map((x) => x.trim())
             .filter(Boolean);
 
-        if (titleParts.length >= 2) {
+        if (
+          titleParts.length >= 2
+        ) {
           const firstPart =
             titleParts[0];
 
           const secondPart =
-            titleParts.slice(1).join(" ");
+            titleParts
+              .slice(1)
+              .join(" ");
 
           surprisesHeading.innerHTML = `
             ${escapeHtml(firstPart)}
             <span>${escapeHtml(secondPart)}</span>
           `;
-        } else if (titleParts.length === 1) {
+        } else if (
+          titleParts.length === 1
+        ) {
           span.textContent =
             titleParts[0];
         }
@@ -555,52 +586,63 @@ document.addEventListener("DOMContentLoaded", async () => {
     ========================================= */
 
     const collectionItems =
-      Array.isArray(collection.items)
+      Array.isArray(
+        collection.items
+      )
         ? collection.items
         : [];
 
     document
-      .querySelectorAll(".surprise-item")
-      .forEach((item, index) => {
-        const data =
-          collectionItems[index];
+      .querySelectorAll(
+        ".surprise-item"
+      )
+      .forEach(
+        (item, index) => {
+          const itemData =
+            collectionItems[index];
 
-        if (!data) return;
+          if (!itemData) return;
 
-        /*
-          ORIGINAL HTML uses:
+          const title =
+            item.querySelector("strong") ||
+            item.querySelector("h3") ||
+            item.querySelector(
+              ".surprise-title"
+            ) ||
+            item.querySelector(
+              ".item-title"
+            );
 
-          <strong>Memories</strong>
-          <small>our little moments</small>
+          const subtitle =
+            item.querySelector("small") ||
+            item.querySelector("p") ||
+            item.querySelector(
+              ".surprise-subtitle"
+            ) ||
+            item.querySelector(
+              ".item-subtitle"
+            );
 
-          So we must target strong + small.
-        */
+          if (
+            title &&
+            itemData.title
+          ) {
+            title.textContent =
+              itemData.title;
+          }
 
-        const title =
-          item.querySelector("strong") ||
-          item.querySelector("h3") ||
-          item.querySelector(".surprise-title") ||
-          item.querySelector(".item-title");
-
-        const subtitle =
-          item.querySelector("small") ||
-          item.querySelector("p") ||
-          item.querySelector(".surprise-subtitle") ||
-          item.querySelector(".item-subtitle");
-
-        if (title && data.title) {
-          title.textContent =
-            data.title;
+          if (
+            subtitle &&
+            itemData.subtitle
+          ) {
+            subtitle.textContent =
+              itemData.subtitle;
+          }
         }
-
-        if (subtitle && data.subtitle) {
-          subtitle.textContent =
-            data.subtitle;
-        }
-      });
+      );
 
     /* =========================================
-       INDIVIDUAL MINI SURPRISE TEXT
+       MINI SURPRISE TEXT
     ========================================= */
 
     const memoriesText =
@@ -640,12 +682,6 @@ document.addEventListener("DOMContentLoaded", async () => {
       "#memoriesModal .modal-subtitle",
       memoriesText
     );
-
-    /*
-      Keep the original visual description.
-      The custom collection text is already
-      shown on the collection card.
-    */
 
     /* =========================================
        LETTER MINI SURPRISE
@@ -704,7 +740,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     );
 
     /* =========================================
-       MUSIC MINI SURPRISE
+       MUSIC MINI SURPRISE TEXT
     ========================================= */
 
     setText(
@@ -726,19 +762,13 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     if (secretPage) {
       const secretMessageValue =
-        secretPage?.content ||
+        secretPage.content ||
         setting(
           secretPage,
           "message",
           secretText
         ) ||
         secretText;
-
-      /*
-        Do not replace the whole #secretMessage
-        element because it contains the original
-        sparkle/design markup.
-      */
 
       const secretHeading =
         document.querySelector(
@@ -767,59 +797,121 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     /* =========================================
-       MUSIC
+       MUSIC DATA
     ========================================= */
 
     const music =
       universe.music || {};
 
     const bg =
-      document.getElementById("bgMusic");
+      document.getElementById(
+        "bgMusic"
+      );
 
     const sm =
-      document.getElementById("surpriseMusic");
+      document.getElementById(
+        "surpriseMusic"
+      );
+
+    /*
+      Support both:
+      - public URL
+      - storage path
+
+      This prevents the Music icon from
+      disappearing just because only one
+      of the two fields exists.
+    */
+
+    const backgroundMusicUrl =
+      music.backgroundMusic ||
+      music.backgroundMusicUrl ||
+      music.backgroundMusicPath ||
+      "";
+
+    const surpriseMusicUrl =
+      music.surpriseMusic ||
+      music.surpriseMusicUrl ||
+      music.surpriseMusicPath ||
+      "";
 
     if (
       bg &&
-      music.backgroundMusicPath
+      backgroundMusicUrl
     ) {
       bg.src =
-        music.backgroundMusicPath;
+        backgroundMusicUrl;
 
       bg.load();
+
+      bg.loop = true;
     }
 
     if (
       sm &&
-      music.surpriseMusicPath
+      surpriseMusicUrl
     ) {
       sm.src =
-        music.surpriseMusicPath;
+        surpriseMusicUrl;
 
       sm.load();
+
+      sm.loop = false;
     }
 
-    if (!music.backgroundMusicPath) {
-      const toggle =
-        document.getElementById(
-          "bgMusicToggle"
-        );
+    /*
+      IMPORTANT:
+      Never hide Music icon when
+      surprise music exists in either
+      URL/path field.
+    */
 
-      if (toggle) {
-        toggle.style.display =
+    const musicItem =
+      document.querySelector(
+        '.surprise-item[data-surprise="music"]'
+      );
+
+    if (musicItem) {
+      if (surpriseMusicUrl) {
+        musicItem.style.display = "";
+        musicItem.removeAttribute(
+          "aria-hidden"
+        );
+      } else {
+        musicItem.style.display =
           "none";
+
+        musicItem.setAttribute(
+          "aria-hidden",
+          "true"
+        );
       }
     }
 
-    if (!music.surpriseMusicPath) {
-      const item =
-        document.querySelector(
-          '.surprise-item[data-surprise="music"]'
-        );
+    /*
+      Background toggle should only be
+      visible when background music exists.
+    */
 
-      if (item) {
-        item.style.display =
+    const toggle =
+      document.getElementById(
+        "bgMusicToggle"
+      );
+
+    if (toggle) {
+      if (backgroundMusicUrl) {
+        toggle.style.display = "";
+        toggle.removeAttribute(
+          "aria-hidden"
+        );
+      } else {
+        toggle.style.display =
           "none";
+
+        toggle.setAttribute(
+          "aria-hidden",
+          "true"
+        );
       }
     }
 
@@ -842,61 +934,99 @@ document.addEventListener("DOMContentLoaded", async () => {
   ========================================= */
 
   const openButton =
-    document.getElementById("openButton");
+    document.getElementById(
+      "openButton"
+    );
 
   const message =
-    document.getElementById("message");
+    document.getElementById(
+      "message"
+    );
 
   const memoryPage =
-    document.getElementById("memoryPage");
+    document.getElementById(
+      "memoryPage"
+    );
 
   const nextMemory =
-    document.getElementById("nextMemory");
+    document.getElementById(
+      "nextMemory"
+    );
 
   const birthdayPage =
-    document.getElementById("birthdayPage");
+    document.getElementById(
+      "birthdayPage"
+    );
 
   const birthdayNext =
-    document.getElementById("birthdayNext");
+    document.getElementById(
+      "birthdayNext"
+    );
 
   const lovePage =
-    document.getElementById("lovePage");
+    document.getElementById(
+      "lovePage"
+    );
 
   const loveNext =
-    document.getElementById("loveNext");
+    document.getElementById(
+      "loveNext"
+    );
 
   const letterPage =
-    document.getElementById("letterPage");
+    document.getElementById(
+      "letterPage"
+    );
 
   const letterNext =
-    document.getElementById("letterNext");
+    document.getElementById(
+      "letterNext"
+    );
 
   const passcodePage =
-    document.getElementById("passcodePage");
+    document.getElementById(
+      "passcodePage"
+    );
 
   const unlockPage =
-    document.getElementById("unlockPage");
+    document.getElementById(
+      "unlockPage"
+    );
 
   const unlockNext =
-    document.getElementById("unlockNext");
+    document.getElementById(
+      "unlockNext"
+    );
 
   const surprisesPage =
-    document.getElementById("surprisesPage");
+    document.getElementById(
+      "surprisesPage"
+    );
 
   const oneLastButton =
-    document.getElementById("oneLastButton");
+    document.getElementById(
+      "oneLastButton"
+    );
 
   const finalPage =
-    document.getElementById("finalPage");
+    document.getElementById(
+      "finalPage"
+    );
 
   const finalReveal =
-    document.getElementById("finalReveal");
+    document.getElementById(
+      "finalReveal"
+    );
 
   const birthdayReveal =
-    document.getElementById("birthdayReveal");
+    document.getElementById(
+      "birthdayReveal"
+    );
 
   const confettiLayer =
-    document.getElementById("confettiLayer");
+    document.getElementById(
+      "confettiLayer"
+    );
 
   /* =========================================
      PAGE 1 → PAGE 2
@@ -1022,7 +1152,9 @@ document.addEventListener("DOMContentLoaded", async () => {
         );
 
         setTimeout(() => {
-          if (PASSWORD_ENABLED) {
+          if (
+            PASSWORD_ENABLED
+          ) {
             passcodePage.classList.add(
               "active"
             );
@@ -1328,7 +1460,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         "confetti";
 
       piece.style.left =
-        Math.random() * 100 + "%";
+        Math.random() * 100 +
+        "%";
 
       piece.style.animationDuration =
         3 +
@@ -1356,7 +1489,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   /* =========================================
-     BACKGROUND MUSIC
+     MUSIC ELEMENTS
   ========================================= */
 
   const bgMusic =
@@ -1399,35 +1532,55 @@ document.addEventListener("DOMContentLoaded", async () => {
       "musicProgress"
     );
 
+  /* =========================================
+     SAVED BACKGROUND MUSIC STATE
+  ========================================= */
+
+  const savedBackgroundEnabled =
+    universeData?.universe
+      ?.music?.backgroundEnabled;
+
   let backgroundMusicEnabled =
-    true;
+    savedBackgroundEnabled ===
+    undefined
+      ? true
+      : Boolean(
+          savedBackgroundEnabled
+        );
 
   let backgroundWasPlaying =
     false;
 
+  /* =========================================
+     MUSIC BUTTON UI
+  ========================================= */
+
   function updateBackgroundMusicButton() {
     if (!bgMusicToggle) return;
 
-    if (backgroundMusicEnabled) {
-      bgMusicToggle.classList.remove(
-        "off"
-      );
+    bgMusicToggle.classList.toggle(
+      "off",
+      !backgroundMusicEnabled
+    );
 
-      if (bgMusicText) {
-        bgMusicText.textContent =
-          "Music On";
-      }
-    } else {
-      bgMusicToggle.classList.add(
-        "off"
-      );
-
-      if (bgMusicText) {
-        bgMusicText.textContent =
-          "Music Off";
-      }
+    if (bgMusicText) {
+      bgMusicText.textContent =
+        backgroundMusicEnabled
+          ? "Music On"
+          : "Music Off";
     }
+
+    bgMusicToggle.setAttribute(
+      "aria-pressed",
+      String(
+        backgroundMusicEnabled
+      )
+    );
   }
+
+  /* =========================================
+     START BACKGROUND MUSIC
+  ========================================= */
 
   function startBackgroundMusic() {
     if (!bgMusic) return;
@@ -1436,35 +1589,58 @@ document.addEventListener("DOMContentLoaded", async () => {
       return;
     }
 
+    if (!bgMusic.src) {
+      return;
+    }
+
     bgMusic
       .play()
-      .catch(() => {});
+      .catch((error) => {
+        /*
+          Browser autoplay may block the
+          first play. It will retry after
+          the next user interaction.
+        */
+
+        console.debug(
+          "Background music waiting for user interaction.",
+          error
+        );
+      });
   }
 
-  /* FIRST USER INTERACTION */
+  /* =========================================
+     FIRST USER INTERACTION
+  ========================================= */
+
+  function firstInteractionMusic() {
+    if (
+      backgroundMusicEnabled &&
+      bgMusic &&
+      bgMusic.src &&
+      bgMusic.paused
+    ) {
+      startBackgroundMusic();
+    }
+  }
 
   document.addEventListener(
     "click",
-    () => {
-      if (
-        backgroundMusicEnabled &&
-        bgMusic &&
-        bgMusic.paused
-      ) {
-        startBackgroundMusic();
-      }
-    },
+    firstInteractionMusic,
     {
       once: true,
     }
   );
 
-  /* BG MUSIC TOGGLE */
+  /* =========================================
+     BACKGROUND MUSIC TOGGLE
+  ========================================= */
 
   if (bgMusicToggle) {
     bgMusicToggle.addEventListener(
       "click",
       (event) => {
+        event.preventDefault();
         event.stopPropagation();
 
         backgroundMusicEnabled =
@@ -1490,7 +1666,24 @@ document.addEventListener("DOMContentLoaded", async () => {
   ========================================= */
 
   function openMusicSurprise() {
-    if (!musicPopup) return;
+    if (!musicPopup) {
+      console.warn(
+        "musicPopup element not found."
+      );
+
+      return;
+    }
+
+    if (
+      !surpriseMusic ||
+      !surpriseMusic.src
+    ) {
+      console.warn(
+        "Surprise music is not available."
+      );
+
+      return;
+    }
 
     backgroundWasPlaying =
       !!(
@@ -1506,13 +1699,15 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (surpriseMusic) {
       surpriseMusic.pause();
 
-      surpriseMusic.currentTime =
-        0;
+      try {
+        surpriseMusic.currentTime =
+          0;
+      } catch {}
     }
 
     if (musicPlay) {
       musicPlay.innerHTML =
-        "<span>▶</span><b>Play Music</b>";
+        `<span>▶</span><b>Play Music</b>`;
     }
 
     if (musicProgress) {
@@ -1520,8 +1715,18 @@ document.addEventListener("DOMContentLoaded", async () => {
         "0%";
     }
 
+    /*
+      Music popup uses its original
+      active class.
+    */
+
     musicPopup.classList.add(
       "active"
+    );
+
+    musicPopup.setAttribute(
+      "aria-hidden",
+      "false"
     );
   }
 
@@ -1531,8 +1736,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (surpriseMusic) {
       surpriseMusic.pause();
 
-      surpriseMusic.currentTime =
-        0;
+      try {
+        surpriseMusic.currentTime =
+          0;
+      } catch {}
     }
 
     if (musicProgress) {
@@ -1542,11 +1749,16 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     if (musicPlay) {
       musicPlay.innerHTML =
-        "<span>▶</span><b>Play Music</b>";
+        `<span>▶</span><b>Play Music</b>`;
     }
 
     musicPopup.classList.remove(
       "active"
+    );
+
+    musicPopup.setAttribute(
+      "aria-hidden",
+      "true"
     );
 
     if (
@@ -1560,7 +1772,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   /* =========================================
-     PLAY MUSIC
+     MUSIC PLAY BUTTON
   ========================================= */
 
   if (
@@ -1569,86 +1781,169 @@ document.addEventListener("DOMContentLoaded", async () => {
   ) {
     musicPlay.addEventListener(
       "click",
-      (event) => {
+      async (event) => {
+        event.preventDefault();
         event.stopPropagation();
 
-        if (surpriseMusic.paused) {
+        if (
+          !surpriseMusic.src
+        ) {
+          return;
+        }
+
+        if (
+          surpriseMusic.paused
+        ) {
           if (bgMusic) {
             bgMusic.pause();
           }
 
-          surpriseMusic
-            .play()
-            .then(() => {
-              musicPlay.innerHTML =
-                "<span>Ⅱ</span><b>Pause Music</b>";
-            })
-            .catch(() => {});
+          try {
+            await surpriseMusic.play();
+
+            musicPlay.innerHTML =
+              `<span>Ⅱ</span><b>Pause Music</b>`;
+          } catch (error) {
+            console.error(
+              "Could not play surprise music:",
+              error
+            );
+
+            musicPlay.innerHTML =
+              `<span>▶</span><b>Play Music</b>`;
+          }
         } else {
           surpriseMusic.pause();
 
           musicPlay.innerHTML =
-            "<span>▶</span><b>Play Music</b>";
+            `<span>▶</span><b>Play Music</b>`;
         }
       }
     );
   }
 
   /* =========================================
-     MUSIC PROGRESS
+     SURPRISE MUSIC EVENTS
   ========================================= */
 
-  if (
-    surpriseMusic &&
-    musicProgress
-  ) {
+  if (surpriseMusic) {
+    surpriseMusic.addEventListener(
+      "play",
+      () => {
+        if (musicPlay) {
+          musicPlay.innerHTML =
+            `<span>Ⅱ</span><b>Pause Music</b>`;
+        }
+      }
+    );
+
+    surpriseMusic.addEventListener(
+      "pause",
+      () => {
+        if (
+          !surpriseMusic.ended &&
+          musicPlay
+        ) {
+          musicPlay.innerHTML =
+            `<span>▶</span><b>Play Music</b>`;
+        }
+      }
+    );
+
+    surpriseMusic.addEventListener(
+      "loadedmetadata",
+      () => {
+        if (
+          musicProgress &&
+          surpriseMusic.duration
+        ) {
+          musicProgress.style.width =
+            "0%";
+        }
+      }
+    );
+
     surpriseMusic.addEventListener(
       "timeupdate",
       () => {
         if (
+          !musicProgress ||
           !surpriseMusic.duration
         ) {
           return;
         }
 
         const percent =
-          (surpriseMusic.currentTime /
-            surpriseMusic.duration) *
-          100;
+          (
+            surpriseMusic.currentTime /
+            surpriseMusic.duration
+          ) * 100;
 
         musicProgress.style.width =
-          percent + "%";
+          `${percent}%`;
       }
     );
 
     surpriseMusic.addEventListener(
       "ended",
       () => {
-        musicProgress.style.width =
-          "0%";
+        if (musicProgress) {
+          musicProgress.style.width =
+            "0%";
+        }
 
         if (musicPlay) {
           musicPlay.innerHTML =
-            "<span>▶</span><b>Play Again</b>";
+            `<span>▶</span><b>Play Again</b>`;
         }
+
+        if (
+          backgroundWasPlaying &&
+          backgroundMusicEnabled
+        ) {
+          startBackgroundMusic();
+        }
+
+        backgroundWasPlaying =
+          false;
       }
     );
   }
 
+  /* =========================================
+     MUSIC CLOSE
+  ========================================= */
+
   if (musicClose) {
     musicClose.addEventListener(
       "click",
-      closeMusicSurprise
+      (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+
+        closeMusicSurprise();
+      }
     );
   }
+
+  /* =========================================
+     MUSIC POPUP BACKDROP
+  ========================================= */
 
   if (musicPopup) {
     musicPopup.addEventListener(
       "click",
       (event) => {
+        const target =
+          event.target;
+
         if (
-          event.target.classList.contains(
-            "music-popup-backdrop"
+          target &&
+          (
+            target.classList?.contains(
+              "music-popup-backdrop"
+            ) ||
+            target === musicPopup
           )
         ) {
           closeMusicSurprise();
@@ -1675,6 +1970,11 @@ document.addEventListener("DOMContentLoaded", async () => {
         modal.classList.remove(
           "active"
         );
+
+        modal.setAttribute(
+          "aria-hidden",
+          "true"
+        );
       });
   }
 
@@ -1689,6 +1989,11 @@ document.addEventListener("DOMContentLoaded", async () => {
     modal.classList.add(
       "active"
     );
+
+    modal.setAttribute(
+      "aria-hidden",
+      "false"
+    );
   }
 
   /* =========================================
@@ -1700,6 +2005,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       item.addEventListener(
         "click",
         (event) => {
+          event.preventDefault();
           event.stopPropagation();
 
           item.classList.remove(
@@ -1811,6 +2117,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       button.addEventListener(
         "click",
         (event) => {
+          event.preventDefault();
           event.stopPropagation();
 
           const id =
@@ -1825,6 +2132,22 @@ document.addEventListener("DOMContentLoaded", async () => {
             modal.classList.remove(
               "active"
             );
+
+            modal.setAttribute(
+              "aria-hidden",
+              "true"
+            );
+          }
+
+          /*
+            If the music modal is being
+            closed, restore background music.
+          */
+
+          if (
+            id === "musicPopup"
+          ) {
+            closeMusicSurprise();
           }
         }
       );
@@ -1843,12 +2166,17 @@ document.addEventListener("DOMContentLoaded", async () => {
         "click",
         (event) => {
           if (
-            event.target.classList.contains(
+            event.target.classList?.contains(
               "surprise-backdrop"
             )
           ) {
             modal.classList.remove(
               "active"
+            );
+
+            modal.setAttribute(
+              "aria-hidden",
+              "true"
             );
           }
         }
@@ -1876,6 +2204,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     secretRevealButton.addEventListener(
       "click",
       (event) => {
+        event.preventDefault();
         event.stopPropagation();
 
         secretMessage.classList.add(
@@ -1913,6 +2242,11 @@ document.addEventListener("DOMContentLoaded", async () => {
     catSurprise.classList.add(
       "active"
     );
+
+    catSurprise.setAttribute(
+      "aria-hidden",
+      "false"
+    );
   }
 
   function closeCatSurprise() {
@@ -1921,12 +2255,18 @@ document.addEventListener("DOMContentLoaded", async () => {
     catSurprise.classList.remove(
       "active"
     );
+
+    catSurprise.setAttribute(
+      "aria-hidden",
+      "true"
+    );
   }
 
   if (catClose) {
     catClose.addEventListener(
       "click",
       (event) => {
+        event.preventDefault();
         event.stopPropagation();
 
         closeCatSurprise();
@@ -1941,7 +2281,9 @@ document.addEventListener("DOMContentLoaded", async () => {
   document.addEventListener(
     "keydown",
     (event) => {
-      if (event.key !== "Escape") {
+      if (
+        event.key !== "Escape"
+      ) {
         return;
       }
 
@@ -1966,8 +2308,32 @@ document.addEventListener("DOMContentLoaded", async () => {
   );
 
   /* =========================================
-     INITIAL STATE
+     INITIAL MUSIC STATE
   ========================================= */
 
   updateBackgroundMusicButton();
+
+  /*
+    If background music is enabled,
+    attempt to start it after the page
+    has loaded.
+
+    Browser autoplay may block this.
+    The first user interaction handler
+    above will start it when allowed.
+  */
+
+  if (
+    backgroundMusicEnabled &&
+    bgMusic &&
+    bgMusic.src
+  ) {
+    bgMusic.loop = true;
+
+    bgMusic
+      .play()
+      .catch(() => {
+        // Expected on browsers that block autoplay.
+      });
+  }
 });

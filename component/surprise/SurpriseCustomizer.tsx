@@ -234,7 +234,8 @@ export default function SurpriseCustomizer({
   };
 
   /* ================================
-     IMAGE UPLOAD — EXACTLY 3
+     MEMORY IMAGE UPLOAD
+     SHARED BY BOTH MEMORY SECTIONS
   ================================= */
 
   const handleMemoryImage = async (
@@ -361,6 +362,7 @@ export default function SurpriseCustomizer({
 
         setData((current) => ({
           ...current,
+
           music: {
             ...current.music,
 
@@ -438,6 +440,7 @@ export default function SurpriseCustomizer({
 
         setData((current) => ({
           ...current,
+
           music: {
             ...current.music,
 
@@ -1184,6 +1187,10 @@ export default function SurpriseCustomizer({
         </div>
 
 
+        {/* =================================
+            COLLECTION ITEMS
+        ================================== */}
+
         <div className="surprise-reasons-editor">
 
           {data.collection.items
@@ -1230,11 +1237,137 @@ export default function SurpriseCustomizer({
                     }
                   />
 
+                  {/* =============================
+                      MEMORIES IMAGE OPTION
+                  ============================== */}
+
+                  {index === 0 && (
+                    <div
+                      style={{
+                        marginTop: "1rem",
+                        width: "100%",
+                      }}
+                    >
+
+                      <span className="surprise-editor-label">
+                        MEMORIES PHOTOS
+                      </span>
+
+                      <p
+                        style={{
+                          marginTop: "0.5rem",
+                          marginBottom: "1rem",
+                          opacity: 0.7,
+                          fontSize: "0.9rem",
+                        }}
+                      >
+                        Add the 3 photos that will open
+                        when the Memories icon is selected.
+                      </p>
+
+                      <div
+                        className="surprise-memory-editor-grid"
+                      >
+
+                        {data.memories.items
+                          .slice(0, 3)
+                          .map(
+                            (
+                              memory,
+                              memoryIndex
+                            ) => (
+                              <div
+                                key={
+                                  memory.id
+                                }
+                                className="surprise-memory-editor glass"
+                              >
+
+                                <div className="surprise-memory-number">
+                                  {String(
+                                    memoryIndex + 1
+                                  ).padStart(
+                                    2,
+                                    "0"
+                                  )}
+                                </div>
+
+                                <div className="surprise-memory-upload">
+
+                                  {memory.image ? (
+                                    <img
+                                      src={
+                                        memory.image
+                                      }
+                                      alt=""
+                                    />
+                                  ) : (
+                                    <span>
+                                      ＋
+                                    </span>
+                                  )}
+
+                                  <input
+                                    type="file"
+                                    accept="image/*"
+                                    disabled={
+                                      uploading
+                                    }
+                                    onChange={(
+                                      event
+                                    ) =>
+                                      handleMemoryImage(
+                                        event,
+                                        memoryIndex
+                                      )
+                                    }
+                                  />
+
+                                </div>
+
+                                <GlassInput
+                                  label="Caption"
+                                  value={
+                                    memory.caption
+                                  }
+                                  onChange={(
+                                    value
+                                  ) =>
+                                    setData(
+                                      (
+                                        current
+                                      ) =>
+                                        updateMemory(
+                                          current,
+                                          memoryIndex,
+                                          {
+                                            caption:
+                                              value,
+                                          }
+                                        )
+                                    )
+                                  }
+                                />
+
+                              </div>
+                            )
+                          )}
+
+                      </div>
+
+                    </div>
+                  )}
+
                 </div>
               )
             )}
 
         </div>
+
+
+        {/* =================================
+            MINI SURPRISE TEXT
+        ================================== */}
 
         <div
           style={{
