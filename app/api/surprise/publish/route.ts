@@ -13,6 +13,13 @@ function makeSlug(title: string) {
   return `${base || "surprise"}-${crypto.randomUUID().slice(0, 8)}`;
 }
 
+type MemoryItem = {
+  id?: string;
+  image?: string;
+  storagePath?: string;
+  caption?: string;
+};
+
 export async function POST(request: Request) {
   try {
     const supabase = await createClient();
@@ -65,18 +72,20 @@ export async function POST(request: Request) {
     }
 
     // =========================================================
-    // PASSWORD VALIDATION
+    // PASSWORD
     // =========================================================
 
     const passwordEnabled = Boolean(
       surprise.password?.enabled
     );
 
+    const passwordCode = String(
+      surprise.password?.code || ""
+    );
+
     if (
       passwordEnabled &&
-      !/^\d{4}$/.test(
-        String(surprise.password?.code || "")
-      )
+      !/^\d{4}$/.test(passwordCode)
     ) {
       return NextResponse.json(
         {
@@ -86,44 +95,27 @@ export async function POST(request: Request) {
       );
     }
 
-    // =========================================================
-    // SLUG
-    // =========================================================
-
-    const slug = makeSlug(
-      surprise.title || "A Little Surprise For You"
-    );
-
-    // =========================================================
-    // PASSWORD HASH
-    // =========================================================
-
-    /*
-     * IMPORTANT:
-     *
-     * Raw password is NEVER stored.
-     * Only the bcrypt hash is saved.
-     */
-
     let passwordHash: string | null = null;
 
     if (passwordEnabled) {
       passwordHash = await bcrypt.hash(
-        String(surprise.password.code),
+        passwordCode,
         12
       );
     }
 
     // =========================================================
-    // LITTLE COLLECTION
+    // SLUG
     // =========================================================
 
-    /*
-     * The six Little Collection items remain part of the
-     * original design.
-     *
-     * Creator can customize their visible text.
-     */
+    const slug = makeSlug(
+      surprise.title ||
+        "A Little Surprise For You"
+    );
+
+    // =========================================================
+    // LITTLE COLLECTION
+    // =========================================================
 
     const collection = surprise.collection || {};
 
@@ -180,7 +172,8 @@ export async function POST(request: Request) {
             surprise.title ||
             "A Little Surprise For You ♡",
 
-          person_name: surprise.personName,
+          person_name:
+            surprise.personName,
 
           relationship: null,
 
@@ -228,9 +221,11 @@ export async function POST(request: Request) {
           // PASSWORD
           // =====================================================
 
-          password_enabled: passwordEnabled,
+          password_enabled:
+            passwordEnabled,
 
-          password_hash: passwordHash,
+          password_hash:
+            passwordHash,
 
           password_screen: {
             hint:
@@ -282,7 +277,8 @@ export async function POST(request: Request) {
           "There’s a surprise waiting for you.",
 
         settings: {
-          personName: surprise.personName,
+          personName:
+            surprise.personName,
         },
       },
 
@@ -297,7 +293,7 @@ export async function POST(request: Request) {
 
         title:
           surprise.memories?.title ||
-          "Our little memories ♡",
+          "Little moments, big memories.",
 
         content:
           surprise.memories?.intro ||
@@ -306,11 +302,11 @@ export async function POST(request: Request) {
         settings: {
           eyebrow:
             surprise.memories?.eyebrow ||
-            "CHAPTER 01",
+            "01 · OUR MEMORIES ♡",
 
           bottomText:
             surprise.memories?.bottomText ||
-            "made of tiny moments",
+            "made of moments I'll always remember ♡",
         },
       },
 
@@ -408,12 +404,14 @@ export async function POST(request: Request) {
         page_order: 6,
         page_type: "password",
 
-        title: "A secret is waiting",
+        title:
+          "A secret is waiting",
 
         content: null,
 
         settings: {
-          enabled: passwordEnabled,
+          enabled:
+            passwordEnabled,
 
           hint:
             surprise.password?.hint ||
@@ -430,9 +428,11 @@ export async function POST(request: Request) {
         page_order: 7,
         page_type: "unlock",
 
-        title: "SECRET UNLOCKED",
+        title:
+          "SECRET UNLOCKED",
 
-        content: "YOU GOT IT",
+        content:
+          "YOU GOT IT",
 
         settings: {},
       },
@@ -448,21 +448,20 @@ export async function POST(request: Request) {
 
         title:
           collection.title ||
-          "Little things for you ♡",
+          "Pick a little surprise ♡",
 
         content:
           collection.subtitle ||
-          "A few little surprises, made especially for you.",
+          "six tiny things, made just for you",
 
         settings: {
           eyebrow:
             collection.eyebrow ||
-            "A LITTLE COLLECTION",
+            "THE LITTLE COLLECTION",
 
-          // Six fixed collection items
-          items: collectionItems,
+          items:
+            collectionItems,
 
-          // Custom text
           memoriesText:
             collection.memoriesText ||
             "our little moments",
@@ -498,9 +497,11 @@ export async function POST(request: Request) {
         page_order: 9,
         page_type: "final",
 
-        title: "ONE LAST THING",
+        title:
+          "ONE LAST THING",
 
-        content: "Make a wish ♡",
+        content:
+          "Make a wish ♡",
 
         settings: {},
       },
@@ -529,38 +530,37 @@ export async function POST(request: Request) {
 
       return NextResponse.json(
         {
-          error: pagesError.message,
+          error:
+            pagesError.message,
         },
         { status: 500 }
       );
     }
 
     // =========================================================
-    // MEMORY MEDIA
+    // MEMORY DATA
     // =========================================================
 
     /*
-     * IMPORTANT:
+     * THERE ARE TWO DIFFERENT MEMORY SETS:
      *
-     * SET 1
-     * surprise.memories.items
-     * = Chapter 01 Memories
+     * 1. Chapter 01
+     *    surprise.memories.items
      *
-     * SET 2
-     * surprise.collection.memories
-     * = Little Collection → Memories
+     * 2. Little Collection → Memories
+     *    surprise.collection.memories
      *
-     * They are intentionally stored separately.
+     * They MUST have different source values.
      */
 
-    const chapterMemoryItems =
+    const chapterMemoryItems: MemoryItem[] =
       Array.isArray(
         surprise.memories?.items
       )
         ? surprise.memories.items
         : [];
 
-    const collectionMemoryItems =
+    const collectionMemoryItems: MemoryItem[] =
       Array.isArray(
         collection.memories
       )
@@ -574,30 +574,21 @@ export async function POST(request: Request) {
     const chapterMemoryRows =
       chapterMemoryItems
         .filter(
-          (item: {
-            image?: string;
-            storagePath?: string;
-            caption?: string;
-          }) =>
+          (item) =>
             Boolean(
               item.image ||
               item.storagePath
             )
         )
         .map(
-          (
-            item: {
-              image?: string;
-              storagePath?: string;
-              caption?: string;
-            },
-            index: number
-          ) => ({
-            universe_id: universe.id,
+          (item, index) => ({
+            universe_id:
+              universe.id,
 
             page_id: null,
 
-            media_type: "image",
+            media_type:
+              "image",
 
             storage_path:
               item.storagePath ||
@@ -622,36 +613,27 @@ export async function POST(request: Request) {
         );
 
     // =========================================================
-    // LITTLE COLLECTION → MEMORIES MEDIA
+    // LITTLE COLLECTION → MEMORIES
     // =========================================================
 
     const collectionMemoryRows =
       collectionMemoryItems
         .filter(
-          (item: {
-            image?: string;
-            storagePath?: string;
-            caption?: string;
-          }) =>
+          (item) =>
             Boolean(
               item.image ||
               item.storagePath
             )
         )
         .map(
-          (
-            item: {
-              image?: string;
-              storagePath?: string;
-              caption?: string;
-            },
-            index: number
-          ) => ({
-            universe_id: universe.id,
+          (item, index) => ({
+            universe_id:
+              universe.id,
 
             page_id: null,
 
-            media_type: "image",
+            media_type:
+              "image",
 
             storage_path:
               item.storagePath ||
@@ -676,7 +658,7 @@ export async function POST(request: Request) {
         );
 
     // =========================================================
-    // COMBINE MEDIA
+    // COMBINE BOTH MEMORY SETS
     // =========================================================
 
     const mediaRows = [
@@ -689,21 +671,16 @@ export async function POST(request: Request) {
     // =========================================================
 
     if (mediaRows.length > 0) {
-      const {
-        error: mediaError,
-      } = await supabase
-        .from("universe_media")
-        .insert(mediaRows);
+      const { error: mediaError } =
+        await supabase
+          .from("universe_media")
+          .insert(mediaRows);
 
       if (mediaError) {
         console.error(
           "Media insert error:",
           mediaError
         );
-
-        // Cleanup universe.
-        // Related pages/media should be removed by
-        // database cascade if configured.
 
         await supabase
           .from("universes")
@@ -734,7 +711,8 @@ export async function POST(request: Request) {
     return NextResponse.json({
       success: true,
 
-      slug: universe.slug,
+      slug:
+        universe.slug,
 
       url:
         `/u/${universe.slug}`,
