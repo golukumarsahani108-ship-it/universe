@@ -37,6 +37,15 @@ export const defaultFeatures: FeatureConfig[] = [
   },
 
   {
+  id: "surprise",
+  name: "Surprise",
+  icon: "🎁",
+  href: "/surprise",
+  enabled: true,
+  description: "Create a little surprise experience for someone special.",
+},
+
+  {
     id: "study",
     name: "Study",
     icon: "📚",

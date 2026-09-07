@@ -271,328 +271,440 @@ export async function POST(request: Request) {
     }
 
     /*
-     * -----------------------------------------
-     * 6. Create pages
-     *
-     * IMPORTANT:
-     * Frontend page IDs are NOT trusted as DB UUIDs.
-     * Database generates the real UUID.
-     * We keep a map:
-     *
-     * frontendPageId -> databasePageId
-     * -----------------------------------------
-     */
+ * -----------------------------------------
+ * 6. Create pages
+ *
+ * IMPORTANT:
+ * Frontend page IDs are NOT trusted as DB UUIDs.
+ * Database generates the real UUID.
+ * -----------------------------------------
+ */
 
-    const pageRows = pages.map(
-      (page: any, index: number) => ({
-        universe_id:
-          universe.id,
+const pageRows = pages.map(
+  (page: any, index: number) => ({
+    universe_id: universe.id,
 
-        page_order:
-          typeof page.order === "number"
-            ? page.order
-            : index + 1,
+    page_order:
+      typeof page.order === "number"
+        ? page.order
+        : index + 1,
 
-        page_type:
-          page.type || "Custom",
+    page_type:
+      page.type || "Custom",
 
-        title:
-          page.title ||
-          `Page ${index + 1}`,
+    title:
+      page.title ||
+      `Page ${index + 1}`,
 
-        content:
-          page.content || null,
+    content:
+      page.content || null,
 
-        settings: {
-          musicEnabled:
-            Boolean(
-              page.musicEnabled
-            ),
+    settings: {
+      /*
+       * Common page settings
+       */
+      musicEnabled:
+        Boolean(page.musicEnabled),
 
-          animationEnabled:
-            Boolean(
-              page.animationEnabled
-            ),
+      animationEnabled:
+        Boolean(page.animationEnabled),
 
-          buttonEnabled:
-            Boolean(
-              page.buttonEnabled
-            ),
+      buttonEnabled:
+        Boolean(page.buttonEnabled),
 
-          buttonText:
-            page.buttonText || "",
+      buttonText:
+        page.buttonText || "",
 
-          buttonAction:
-            page.buttonAction ||
-            "next",
-
-          images:
-            Array.isArray(
-              page.images
-            )
-              ? page.images.map(
-                  (
-                    image: any,
-                    imageIndex: number
-                  ) => ({
-                    id:
-                      image.id,
-
-                    name:
-                      image.name,
-
-                    url:
-                      image.url || "",
-
-                    storagePath:
-                      image.storagePath ||
-                      "",
-
-                    type:
-                      image.type ||
-                      "",
-
-                    size:
-                      typeof image.size ===
-                      "number"
-                        ? image.size
-                        : 0,
-
-                    order:
-                      imageIndex,
-                  })
-                )
-              : [],
-        },
-      })
-    );
-
-    const {
-      data: insertedPages,
-      error: pagesError,
-    } = await supabase
-      .from("universe_pages")
-      .insert(pageRows)
-      .select(
-        "id, page_order"
-      );
-
-    if (
-      pagesError ||
-      !insertedPages
-    ) {
-      console.error(
-        "Pages insert error:",
-        pagesError
-      );
-
-      await supabase
-        .from("universes")
-        .delete()
-        .eq(
-          "id",
-          universe.id
-        );
-
-      return NextResponse.json(
-        {
-          success: false,
-          error:
-            pagesError?.message ||
-            "Failed to save universe pages.",
-        },
-        { status: 500 }
-      );
-    }
-
-    /*
-     * -----------------------------------------
-     * 7. Build frontend page ID -> DB page ID
-     * -----------------------------------------
-     *
-     * pageRows and insertedPages are returned
-     * in the same insert order.
-     * -----------------------------------------
-     */
-
-    const pageIdMap =
-      new Map<string, string>();
-
-    pages.forEach(
-      (
-        page: any,
-        index: number
-      ) => {
-        const frontendPageId =
-          page.id;
-
-        const databasePage =
-          insertedPages[index];
-
-        if (
-          frontendPageId &&
-          databasePage?.id
-        ) {
-          pageIdMap.set(
-            frontendPageId,
-            databasePage.id
-          );
-        }
-      }
-    );
-
-    /*
-     * -----------------------------------------
-     * 8. Validate and save media
-     * -----------------------------------------
-     */
-
-    const mediaList =
-      Array.isArray(media)
-        ? media
-        : [];
-
-    if (
-      mediaList.length > 0
-    ) {
-      const mediaRows =
-        mediaList.map(
-          (
-            item: any,
-            index: number
-          ) => {
-            /*
-             * Image page mapping
-             *
-             * Music has pageId = null.
-             */
-
-            let databasePageId:
-              string | null = null;
-
-            if (
-              item.pageId
-            ) {
-              databasePageId =
-                pageIdMap.get(
-                  item.pageId
-                ) || null;
-            }
-
-            return {
-              universe_id:
-                universe.id,
-
-              page_id:
-                databasePageId,
-
-              media_type:
-                item.mediaType ||
-                "image",
-
-              storage_path:
-                item.storagePath,
-
-              public_url:
-                item.publicUrl ||
-                null,
-
-              media_order:
-                typeof item.order ===
-                "number"
-                  ? item.order
-                  : index,
-
-              metadata:
-                item.metadata || {},
-            };
-          }
-        );
+      buttonAction:
+        page.buttonAction || "next",
 
       /*
-       * Don't insert media without
-       * a Storage path.
+       * -----------------------------------------
+       * Images
+       * -----------------------------------------
        */
 
-      const invalidMedia =
-        mediaRows.some(
-          (
-            item: any
-          ) =>
-            !item.storage_path
-        );
+      images:
+        Array.isArray(page.images)
+          ? page.images.map(
+              (
+                image: any,
+                imageIndex: number
+              ) => ({
+                id:
+                  image.id ||
+                  crypto.randomUUID(),
 
-      if (
-        invalidMedia
-      ) {
-        console.error(
-          "Invalid media payload:",
-          mediaRows
-        );
+                name:
+                  image.name || "",
 
-        await supabase
-          .from("universes")
-          .delete()
-          .eq(
-            "id",
-            universe.id
-          );
+                url:
+                  image.url || "",
 
-        return NextResponse.json(
-          {
-            success: false,
-            error:
-              "One or more media files are missing a storage path.",
-          },
-          { status: 400 }
-        );
-      }
+                storagePath:
+                  image.storagePath ||
+                  "",
 
-      const {
-        error: mediaError,
-      } = await supabase
-        .from(
-          "universe_media"
+                type:
+                  image.type || "",
+
+                size:
+                  typeof image.size ===
+                  "number"
+                    ? image.size
+                    : 0,
+
+                order:
+                  imageIndex,
+              })
+            )
+          : [],
+
+      /*
+       * -----------------------------------------
+       * Dynamic page-specific data
+       * -----------------------------------------
+       */
+
+      reasons:
+        Array.isArray(page.reasons)
+          ? page.reasons
+          : [],
+
+      favouriteThings:
+        Array.isArray(
+          page.favouriteThings
         )
-        .insert(
-          mediaRows
-        );
+          ? page.favouriteThings
+          : [],
 
-      if (
-        mediaError
-      ) {
-        console.error(
-          "Media insert error:",
-          mediaError
-        );
+      quotes:
+        Array.isArray(page.quotes)
+          ? page.quotes
+          : [],
 
+      timeline:
+        Array.isArray(page.timeline)
+          ? page.timeline
+          : [],
+
+      /*
+       * Letter
+       */
+
+      letter:
+        typeof page.letter === "string"
+          ? page.letter
+          : "",
+
+      /*
+       * Surprise
+       */
+
+      surprise:
+        typeof page.surprise === "string"
+          ? page.surprise
+          : "",
+
+      /*
+       * Secret
+       */
+
+      secret:
+        typeof page.secret === "string"
+          ? page.secret
+          : "",
+
+      /*
+       * Final reveal
+       */
+
+      finalMessage:
+        typeof page.finalMessage ===
+        "string"
+          ? page.finalMessage
+          : "",
+
+      /*
+       * Custom page data
+       */
+
+      customData:
+        page.customData &&
+        typeof page.customData ===
+          "object"
+          ? page.customData
+          : {},
+    },
+  })
+);
+
+/*
+ * -----------------------------------------
+ * Insert pages
+ * -----------------------------------------
+ */
+
+const {
+  data: insertedPages,
+  error: pagesError,
+} = await supabase
+  .from("universe_pages")
+  .insert(pageRows)
+  .select("id, page_order");
+
+/*
+ * -----------------------------------------
+ * Handle page insert error
+ * -----------------------------------------
+ */
+
+if (
+  pagesError ||
+  !insertedPages
+) {
+  console.error(
+    "Pages insert error:",
+    pagesError
+  );
+
+  await supabase
+    .from("universes")
+    .delete()
+    .eq(
+      "id",
+      universe.id
+    );
+
+  return NextResponse.json(
+    {
+      success: false,
+
+      error:
+        pagesError?.message ||
+        "Failed to save universe pages.",
+    },
+    {
+      status: 500,
+    }
+  );
+}
+
+/*
+ * -----------------------------------------
+ * 7. Build frontend page ID
+ * -> database page ID
+ * -----------------------------------------
+ */
+
+const pageIdMap =
+  new Map<string, string>();
+
+pages.forEach(
+  (
+    page: any,
+    index: number
+  ) => {
+    const frontendPageId =
+      page.id;
+
+    const databasePage =
+      insertedPages[index];
+
+    if (
+      frontendPageId &&
+      databasePage?.id
+    ) {
+      pageIdMap.set(
+        frontendPageId,
+        databasePage.id
+      );
+    }
+  }
+);
+
+/*
+ * -----------------------------------------
+ * 8. Validate and save media
+ * -----------------------------------------
+ */
+
+const mediaList =
+  Array.isArray(media)
+    ? media
+    : [];
+
+if (
+  mediaList.length > 0
+) {
+  const mediaRows =
+    mediaList.map(
+      (
+        item: any,
+        index: number
+      ) => {
         /*
-         * Cleanup database records.
-         * Storage cleanup will be handled separately
-         * because Storage objects were uploaded before
-         * this API request.
+         * Music does not belong
+         * to a specific page.
+         *
+         * Images can have pageId.
          */
 
-        await supabase
-          .from("universes")
-          .delete()
-          .eq(
-            "id",
-            universe.id
-          );
+        let databasePageId:
+          string | null = null;
 
-        return NextResponse.json(
-          {
-            success: false,
-            error:
-              mediaError.message ||
-              "Failed to save universe media.",
-          },
-          { status: 500 }
-        );
+        if (
+          item.pageId
+        ) {
+          databasePageId =
+            pageIdMap.get(
+              item.pageId
+            ) || null;
+        }
+
+        return {
+          universe_id:
+            universe.id,
+
+          page_id:
+            databasePageId,
+
+          media_type:
+            item.mediaType ||
+            "image",
+
+          storage_path:
+            item.storagePath,
+
+          public_url:
+            item.publicUrl ||
+            null,
+
+          media_order:
+            typeof item.order ===
+            "number"
+              ? item.order
+              : index,
+
+          metadata:
+            item.metadata || {},
+        };
       }
-    }
+    );
 
+  /*
+   * -----------------------------------------
+   * Validate storage paths
+   * -----------------------------------------
+   */
+
+  const invalidMedia =
+    mediaRows.some(
+      (
+        item: any
+      ) =>
+        !item.storage_path
+    );
+
+  if (
+    invalidMedia
+  ) {
+    console.error(
+      "Invalid media payload:",
+      mediaRows
+    );
+
+    await supabase
+      .from("universes")
+      .delete()
+      .eq(
+        "id",
+        universe.id
+      );
+
+    return NextResponse.json(
+      {
+        success: false,
+
+        error:
+          "One or more media files are missing a storage path.",
+      },
+      {
+        status: 400,
+      }
+    );
+  }
+
+  /*
+   * -----------------------------------------
+   * Insert media
+   * -----------------------------------------
+   */
+
+  const {
+    error: mediaError,
+  } = await supabase
+    .from(
+      "universe_media"
+    )
+    .insert(
+      mediaRows
+    );
+
+  if (
+    mediaError
+  ) {
+    console.error(
+      "Media insert error:",
+      mediaError
+    );
+
+    await supabase
+      .from("universes")
+      .delete()
+      .eq(
+        "id",
+        universe.id
+      );
+
+    return NextResponse.json(
+      {
+        success: false,
+
+        error:
+          mediaError.message ||
+          "Failed to save universe media.",
+      },
+      {
+        status: 500,
+      }
+    );
+  }
+}
+
+/*
+ * -----------------------------------------
+ * 9. Success
+ * -----------------------------------------
+ */
+
+return NextResponse.json({
+  success: true,
+
+  universe: {
+    id:
+      universe.id,
+
+    slug:
+      universe.slug,
+
+    url:
+      `/u/${universe.slug}`,
+  },
+
+  pages:
+    insertedPages || [],
+});
     /*
      * -----------------------------------------
      * 9. Success

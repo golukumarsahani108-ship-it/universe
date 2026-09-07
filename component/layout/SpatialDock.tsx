@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation";
 const dockItems = [
   { name: "Home", icon: "⌂", href: "/" },
   { name: "Me", icon: "♟", href: "/me" },
-  { name: "Create", icon: "✨", href: "/create-universe" },
+ { name: "Create Surprise", icon: "✨", href: "/surprise" },
   { name: "Settings", icon: "⚙", href: "/settings" },
   { name: "Support", icon: "💬", href: "/support" },
 ];
