@@ -16,6 +16,11 @@ export type SurpriseData = {
   personName: string;
   openingMessage: string;
 
+  /*
+   * CHAPTER 01 MEMORIES
+   * These 3 images are completely separate
+   * from Little Collection → Memories.
+   */
   memories: {
     eyebrow: string;
     title: string;
@@ -64,12 +69,24 @@ export type SurpriseData = {
     surpriseMusicPath: string;
   };
 
+  /*
+   * LITTLE COLLECTION
+   */
   collection: {
     eyebrow: string;
     title: string;
     subtitle: string;
 
     items: SurpriseCollectionItem[];
+
+    /*
+     * SEPARATE MEMORIES FOR
+     * LITTLE COLLECTION → MEMORIES
+     *
+     * These are NOT connected to
+     * data.memories.items.
+     */
+    memories: SurpriseMemory[];
 
     memoriesText: string;
     letterText: string;
@@ -88,6 +105,10 @@ export const DEFAULT_SURPRISE_DATA: SurpriseData = {
   openingMessage:
     "There’s a surprise waiting for you.",
 
+  /*
+   * CHAPTER 01
+   * Completely independent 3 images.
+   */
   memories: {
     eyebrow: "CHAPTER 01",
 
@@ -237,6 +258,32 @@ export const DEFAULT_SURPRISE_DATA: SurpriseData = {
         id: "collection-music",
         title: "Music",
         subtitle: "a song for you",
+      },
+    ],
+
+    /*
+     * LITTLE COLLECTION → MEMORIES
+     *
+     * Completely separate from Chapter 01.
+     */
+    memories: [
+      {
+        id: "collection-memory-1",
+        image: "",
+        storagePath: "",
+        caption: "01 a little moment ♡",
+      },
+      {
+        id: "collection-memory-2",
+        image: "",
+        storagePath: "",
+        caption: "02 another little moment ✦",
+      },
+      {
+        id: "collection-memory-3",
+        image: "",
+        storagePath: "",
+        caption: "03 one more memory ♡",
       },
     ],
 

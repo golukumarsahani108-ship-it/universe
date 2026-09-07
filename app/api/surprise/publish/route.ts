@@ -166,24 +166,19 @@ export async function POST(request: Request) {
 
           music: {
             backgroundEnabled:
-              surprise.music?.backgroundEnabled ??
-              false,
+              surprise.music?.backgroundEnabled ?? false,
 
             backgroundMusic:
-              surprise.music?.backgroundMusic ||
-              null,
+              surprise.music?.backgroundMusic || null,
 
             backgroundMusicPath:
-              surprise.music?.backgroundMusicPath ||
-              null,
+              surprise.music?.backgroundMusicPath || null,
 
             surpriseMusic:
-              surprise.music?.surpriseMusic ||
-              null,
+              surprise.music?.surpriseMusic || null,
 
             surpriseMusicPath:
-              surprise.music?.surpriseMusicPath ||
-              null,
+              surprise.music?.surpriseMusicPath || null,
           },
 
           password_enabled: passwordEnabled,
@@ -469,12 +464,35 @@ export async function POST(request: Request) {
     }
 
     /*
+     * =========================================================
      * MEMORY MEDIA
+     * =========================================================
+     *
+     * IMPORTANT:
+     *
+     * 1. surprise.memories.items
+     *    = Chapter 01 Memories
+     *
+     * 2. surprise.collection.memories
+     *    = Little Collection → Memories
+     *
+     * These are intentionally stored separately.
      */
-    const memoryItems =
-      surprise.memories?.items || [];
 
-    const mediaRows = memoryItems
+    const chapterMemoryItems =
+      Array.isArray(surprise.memories?.items)
+        ? surprise.memories.items
+        : [];
+
+    const collectionMemoryItems =
+      Array.isArray(collection.memories)
+        ? collection.memories
+        : [];
+
+    /*
+     * CHAPTER 01 MEMORY MEDIA
+     */
+    const chapterMemoryRows = chapterMemoryItems
       .filter(
         (item: {
           image?: string;
@@ -512,11 +530,69 @@ export async function POST(request: Request) {
               item.caption || "",
 
             source:
-              "surprise-builder",
+              "chapter-memories",
           },
         })
       );
 
+    /*
+     * LITTLE COLLECTION MEMORY MEDIA
+     */
+    const collectionMemoryRows =
+      collectionMemoryItems
+        .filter(
+          (item: {
+            image?: string;
+            storagePath?: string;
+            caption?: string;
+          }) =>
+            item.image ||
+            item.storagePath
+        )
+        .map(
+          (
+            item: {
+              image?: string;
+              storagePath?: string;
+              caption?: string;
+            },
+            index: number
+          ) => ({
+            universe_id: universe.id,
+
+            page_id: null,
+
+            media_type: "image",
+
+            storage_path:
+              item.storagePath || "",
+
+            public_url:
+              item.image || null,
+
+            media_order: index + 1,
+
+            metadata: {
+              caption:
+                item.caption || "",
+
+              source:
+                "collection-memories",
+            },
+          })
+        );
+
+    /*
+     * COMBINE BOTH MEDIA SETS
+     */
+    const mediaRows = [
+      ...chapterMemoryRows,
+      ...collectionMemoryRows,
+    ];
+
+    /*
+     * SAVE MEDIA
+     */
     if (mediaRows.length > 0) {
       const { error: mediaError } =
         await supabase
@@ -529,6 +605,15 @@ export async function POST(request: Request) {
           mediaError
         );
 
+        /*
+         * Cleanup universe if media insert fails.
+         */
+        await supabase
+          .from("universes")
+          .delete()
+          .eq("id", universe.id)
+          .eq("owner_id", user.id);
+
         return NextResponse.json(
           {
             error: mediaError.message,
@@ -538,6 +623,9 @@ export async function POST(request: Request) {
       }
     }
 
+    /*
+     * SUCCESS
+     */
     return NextResponse.json({
       success: true,
 

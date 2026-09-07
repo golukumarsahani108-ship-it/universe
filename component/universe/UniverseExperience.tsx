@@ -130,13 +130,6 @@ type TimelineItem = {
   description?: string;
 };
 
-const [collectionModal, setCollectionModal] = useState<
-  "memories" | "letter" | "flowers" | "surprise" | "secret" | "music" | null
->(null);
-
-const [catOpened, setCatOpened] = useState(false);
-const [secretRevealed, setSecretRevealed] = useState(false);
-
 const DEFAULT_REASONS: ReasonItem[] = [
   {
     title: "Your presence",
@@ -156,26 +149,6 @@ const DEFAULT_REASONS: ReasonItem[] = [
   },
 ];
 
-const openCollectionItem = (
-  item: "memories" | "letter" | "flowers" | "surprise" | "secret" | "music"
-) => {
-  setCollectionModal(item);
-
-  if (item !== "surprise") {
-    setCatOpened(false);
-  }
-
-  if (item !== "secret") {
-    setSecretRevealed(false);
-  }
-};
-
-const closeCollectionItem = () => {
-  setCollectionModal(null);
-  setCatOpened(false);
-  setSecretRevealed(false);
-};
-
 function getSetting<T = unknown>(
   page: UniversePage | undefined,
   key: string
@@ -188,37 +161,25 @@ function getSetting<T = unknown>(
 
   const value = settings[key];
 
-  return value !== undefined
-    ? (value as T)
-    : null;
+  return value !== undefined ? (value as T) : null;
 }
 
 function getSettingArray<T = unknown>(
   page: UniversePage | undefined,
   key: string
 ): T[] {
-  const value = getSetting<unknown[]>(
-    page,
-    key
-  );
+  const value = getSetting<unknown[]>(page, key);
 
-  return Array.isArray(value)
-    ? (value as T[])
-    : [];
+  return Array.isArray(value) ? (value as T[]) : [];
 }
 
 function getStringSetting(
   page: UniversePage | undefined,
   key: string
 ) {
-  const value = getSetting<unknown>(
-    page,
-    key
-  );
+  const value = getSetting<unknown>(page, key);
 
-  return typeof value === "string"
-    ? value
-    : "";
+  return typeof value === "string" ? value : "";
 }
 
 function findPage(
@@ -228,9 +189,7 @@ function findPage(
   return pages.find((page) =>
     types.some(
       (type) =>
-        page.page_type
-          ?.toLowerCase()
-          .trim() ===
+        page.page_type?.toLowerCase().trim() ===
         type.toLowerCase()
     )
   );
@@ -243,9 +202,7 @@ function findAllPages(
   return pages.filter((page) =>
     types.some(
       (type) =>
-        page.page_type
-          ?.toLowerCase()
-          .trim() ===
+        page.page_type?.toLowerCase().trim() ===
         type.toLowerCase()
     )
   );
@@ -260,11 +217,8 @@ export default function UniverseExperience({
   const [step, setStep] =
     useState<ExperienceStep>("welcome");
 
-
   const [passwordError, setPasswordError] =
     useState("");
-
-  
 
   const [showMusicPanel, setShowMusicPanel] =
     useState(false);
@@ -281,25 +235,56 @@ export default function UniverseExperience({
   const surpriseAudioRef =
     useRef<HTMLAudioElement | null>(null);
 
-    const passwordInputRef =
-  useRef<HTMLInputElement | null>(null);
+  const passwordInputRef =
+    useRef<HTMLInputElement | null>(null);
 
+  const [passwordInput, setPasswordInput] =
+    useState("");
 
-    const [passwordInput, setPasswordInput] = useState("");
+  const [passwordChecking, setPasswordChecking] =
+    useState(false);
 
-const [passwordChecking, setPasswordChecking] = useState(false);
+  // IMPORTANT:
+  // collectionModal ab null bhi accept karega
+  const [collectionModal, setCollectionModal] =
+    useState<CollectionModal>(null);
 
-const [collectionModal, setCollectionModal] =
-  useState<CollectionModal>(null);
+  const [secretRevealed, setSecretRevealed] =
+    useState(false);
 
-const [secretRevealed, setSecretRevealed] =
-  useState(false);
+  const [catOpened, setCatOpened] =
+    useState(false);
 
-const [catOpened, setCatOpened] =
-  useState(false);
+  const [isSceneTransitioning, setIsSceneTransitioning] =
+    useState(false);
 
+  // Collection item open karne ke liye
+  const openCollectionItem = (
+    item:
+      | "memories"
+      | "letter"
+      | "flowers"
+      | "surprise"
+      | "secret"
+      | "music"
+  ) => {
+    setCollectionModal(item);
 
-const [isSceneTransitioning, setIsSceneTransitioning] = useState(false);
+    if (item !== "surprise") {
+      setCatOpened(false);
+    }
+
+    if (item !== "secret") {
+      setSecretRevealed(false);
+    }
+  };
+
+  // Collection modal close karne ke liye
+  const closeCollectionItem = () => {
+    setCollectionModal(null);
+    setCatOpened(false);
+    setSecretRevealed(false);
+  };
 
 
   /*
@@ -559,11 +544,79 @@ const [isSceneTransitioning, setIsSceneTransitioning] = useState(false);
    * -----------------------------------------
    */
 
-  const memoryImages =
-    memoryPages.flatMap(
-      (page) =>
-        getPageImages(page)
+ /*
+ * -----------------------------------------
+ * Chapter 01 Memories
+ * -----------------------------------------
+ *
+ * These images are ONLY for the main
+ * Chapter 01 Memories section.
+ */
+const memoryImages = useMemo(() => {
+  return media
+    .filter((item) => {
+      if (item.media_type !== "image") {
+        return false;
+      }
+
+      const source =
+        item.metadata &&
+        typeof item.metadata === "object" &&
+        "source" in item.metadata
+          ? String(item.metadata.source)
+          : "";
+
+      /*
+       * New published surprises use:
+       * chapter-memories
+       *
+       * Old surprises used:
+       * surprise-builder
+       *
+       * Keep old fallback so existing
+       * published surprises don't break.
+       */
+      return (
+        source === "chapter-memories" ||
+        source === "surprise-builder"
+      );
+    })
+    .sort(
+      (a, b) =>
+        a.media_order - b.media_order
     );
+}, [media]);
+
+/*
+ * -----------------------------------------
+ * Little Collection → Memories
+ * -----------------------------------------
+ *
+ * IMPORTANT:
+ * These are completely separate from
+ * Chapter 01 Memories.
+ */
+const collectionMemoryImages = useMemo(() => {
+  return media
+    .filter((item) => {
+      if (item.media_type !== "image") {
+        return false;
+      }
+
+      const source =
+        item.metadata &&
+        typeof item.metadata === "object" &&
+        "source" in item.metadata
+          ? String(item.metadata.source)
+          : "";
+
+      return source === "collection-memories";
+    })
+    .sort(
+      (a, b) =>
+        a.media_order - b.media_order
+    );
+}, [media]);
 
   /*
    * -----------------------------------------
@@ -1003,30 +1056,6 @@ function continueFromLetter() {
   setStep("surprises");
 }
 
-function openCollectionItem(
-  item:
-    | "memories"
-    | "letter"
-    | "flowers"
-    | "surprise"
-    | "secret"
-    | "music"
-) {
-  setCollectionModal(item);
-
-  if (item === "secret") {
-    setSecretRevealed(false);
-  }
-
-  if (item === "surprise") {
-    setCatOpened(false);
-  }
-}
-
-function closeCollectionItem() {
-  setCollectionModal(null);
-  setCatOpened(false);
-}
   /*
    * -----------------------------------------
    * Dynamic surprise image
@@ -2542,9 +2571,9 @@ function closeCollectionItem() {
             some of the sweetest memories.
           </p>
 
-          {memoryImages.length > 0 ? (
-            <div className="reference-memory-modal-grid">
-              {memoryImages.map((image, index) => (
+         {collectionMemoryImages.length > 0 ? (
+  <div className="reference-memory-modal-grid">
+    {collectionMemoryImages.map((image, index) => (
                 <div
                   className="reference-memory-modal-card"
                   key={image.id || `${image.public_url}-${index}`}
@@ -3067,3 +3096,4 @@ function closeCollectionItem() {
     </main>
   );
 }
+
