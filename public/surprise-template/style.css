@@ -8199,3 +8199,113 @@ backdrop-filter: blur(22px);
     font-size: 8px !important;
   }
 }
+
+/* =========================================
+   CHAPTER 01 — PERFECT MOBILE SIZE
+========================================= */
+
+@media (max-width: 700px) {
+
+  .memory-container {
+    padding: 20px 16px !important;
+  }
+
+  .memory-header h2 {
+    font-size: 36px !important;
+  }
+
+  .memory-chapter {
+    font-size: 9px !important;
+  }
+
+  .memory-counter {
+    font-size: 8px !important;
+    padding: 7px 10px !important;
+  }
+
+  .memory-intro {
+    font-size: 11px !important;
+    line-height: 1.55 !important;
+    margin: 14px 0 17px !important;
+    max-width: 290px !important;
+  }
+
+  .memory-gallery {
+    gap: 13px !important;
+    margin-top: 15px !important;
+    padding: 6px 15px 14px !important;
+  }
+
+  .memory-photo,
+  .memory-photo.photo-one,
+  .memory-photo.photo-two,
+  .memory-photo.photo-three {
+    flex: 0 0 70vw !important;
+    width: 70vw !important;
+    max-width: 260px !important;
+  }
+
+  .photo-image {
+    height: 215px !important;
+  }
+
+  .photo-caption {
+    padding: 9px 4px 2px !important;
+    font-size: 11px !important;
+  }
+
+  .photo-caption span {
+    font-size: 8px !important;
+  }
+
+  .memory-bottom {
+    margin-top: 5px !important;
+  }
+
+  .memory-bottom > span {
+    font-size: 8px !important;
+  }
+
+  #nextMemory {
+    padding: 9px 12px !important;
+    gap: 9px !important;
+    font-size: 10px !important;
+    border-radius: 12px !important;
+  }
+
+  #nextMemory b {
+    width: 25px !important;
+    height: 25px !important;
+    font-size: 13px !important;
+  }
+}
+
+
+/* SMALL PHONES */
+@media (max-width: 380px) {
+
+  .memory-container {
+    padding: 18px 13px !important;
+  }
+
+  .memory-header h2 {
+    font-size: 33px !important;
+  }
+
+  .memory-intro {
+    font-size: 10px !important;
+  }
+
+  .memory-photo,
+  .memory-photo.photo-one,
+  .memory-photo.photo-two,
+  .memory-photo.photo-three {
+    flex-basis: 68vw !important;
+    width: 68vw !important;
+    max-width: 245px !important;
+  }
+
+  .photo-image {
+    height: 200px !important;
+  }
+}
