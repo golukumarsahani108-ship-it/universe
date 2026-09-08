@@ -294,14 +294,17 @@ document.addEventListener("DOMContentLoaded", async () => {
       )
     );
 
-    const memoryMedia =
+       const memoryMedia =
       (universeData.media || [])
         .filter(
           (x) =>
             String(
               x.media_type || ""
             ).toLowerCase() ===
-            "image"
+              "image" &&
+            (x.metadata?.source ||
+              "chapter-memories") ===
+              "chapter-memories"
         )
         .sort(
           (a, b) =>
@@ -682,6 +685,71 @@ document.addEventListener("DOMContentLoaded", async () => {
       "#memoriesModal .modal-subtitle",
       memoriesText
     );
+
+        /* =========================================
+       LITTLE COLLECTION → MEMORIES PHOTOS
+       (separate from Chapter 01 gallery)
+    ========================================= */
+
+    const collectionMemoryMedia =
+      (universeData.media || [])
+        .filter(
+          (x) =>
+            String(
+              x.media_type || ""
+            ).toLowerCase() ===
+              "image" &&
+            x.metadata?.source ===
+              "collection-memories"
+        )
+        .sort(
+          (a, b) =>
+            (a.media_order || 0) -
+            (b.media_order || 0)
+        )
+        .slice(0, 3);
+
+    document
+      .querySelectorAll(
+        "#memoriesModal .mini-memory"
+      )
+      .forEach(
+        (card, index) => {
+          const item =
+            collectionMemoryMedia[
+              index
+            ];
+
+          if (!item) return;
+
+          const img =
+            card.querySelector(
+              "img"
+            );
+
+          const caption =
+            card.querySelector(
+              "span"
+            );
+
+          if (
+            img &&
+            item.public_url
+          ) {
+            img.src =
+              item.public_url;
+          }
+
+          if (
+            caption &&
+            item.metadata
+              ?.caption
+          ) {
+            caption.textContent =
+              item.metadata.caption;
+          }
+        }
+      );
 
     /* =========================================
        LETTER MINI SURPRISE
