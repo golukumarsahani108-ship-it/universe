@@ -62,6 +62,80 @@ export async function POST(request: Request) {
     // BASIC VALIDATION
     // =========================================================
 
+    const requestedTemplate = String(surprise.template || "");
+    const isBuiltInTemplate =
+      requestedTemplate === "birthday-01" ||
+      requestedTemplate === "birthday-02";
+
+    // =========================================================
+    // ADMIN-UPLOADED TEMPLATE
+    // =========================================================
+    // Uploaded templates use the same universes table as the original
+    // experience, but keep their template id + creator data inside the
+    // existing JSON design column. No new universe columns are required.
+    if (!isBuiltInTemplate && /^[0-9a-f-]{36}$/i.test(requestedTemplate)) {
+      const { data: template, error: templateError } = await supabase
+        .from("website_templates")
+        .select("id,name,slug,status,category")
+        .eq("id", requestedTemplate)
+        .eq("status", "published")
+        .maybeSingle();
+
+      if (templateError || !template) {
+        return NextResponse.json({ error: "This website template is no longer available." }, { status: 404 });
+      }
+
+      const title = String(surprise.title || template.name || "A Little Surprise").trim();
+      const personName = String(surprise.personName || "").trim();
+      const slug = makeSlug(title);
+      const templateData =
+        surprise.templateData && typeof surprise.templateData === "object"
+          ? surprise.templateData
+          : {};
+
+      const { data: universe, error: universeError } = await supabase
+        .from("universes")
+        .insert({
+          owner_id: user.id,
+          slug,
+          title,
+          person_name: personName || null,
+          relationship: null,
+          opening_message: "",
+          description: null,
+          theme: "spatial-glass",
+          design: {
+            version: 2,
+            type: "uploaded-template",
+            template_id: template.id,
+            template_slug: template.slug,
+            custom_data: templateData,
+          },
+          music: {},
+          password_enabled: false,
+          password_hash: null,
+          password_screen: {},
+          published: true,
+        })
+        .select("id,slug")
+        .single();
+
+      if (universeError || !universe) {
+        return NextResponse.json({ error: universeError?.message || "Could not publish the website." }, { status: 500 });
+      }
+
+      return NextResponse.json({
+        success: true,
+        slug: universe.slug,
+        url: `/u/${universe.slug}`,
+        templateId: template.id,
+      });
+    }
+
+    // =========================================================
+    // BASIC VALIDATION
+    // =========================================================
+
     if (!surprise.personName?.trim()) {
       return NextResponse.json(
         {

@@ -1,0 +1,1323 @@
+/* =========================================================
+   MY LITTLE UNIVERSE
+   ACCOUNT LOGIN
+   BLUE FUTURISTIC / GLASS UI
+========================================================= */
+
+* {
+    box-sizing: border-box;
+  }
+  
+  .login-page {
+    min-height: 100vh;
+    width: 100%;
+    position: relative;
+  
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  
+    padding: 55px 30px;
+    overflow: hidden;
+  
+    background:
+      radial-gradient(
+        circle at 50% 45%,
+        rgba(30, 120, 255, 0.18),
+        transparent 35%
+      ),
+      radial-gradient(
+        circle at 10% 50%,
+        rgba(20, 80, 200, 0.14),
+        transparent 30%
+      ),
+      radial-gradient(
+        circle at 90% 50%,
+        rgba(40, 150, 255, 0.12),
+        transparent 30%
+      ),
+      #03070d;
+  
+    color: #fff;
+  }
+  
+  
+  /* =========================================================
+     BACKGROUND
+  ========================================================= */
+  
+  .login-bg {
+    position: fixed;
+    inset: 0;
+  
+    pointer-events: none;
+    overflow: hidden;
+  }
+  
+  
+  /* =========================================================
+     BLUE GLOWS
+  ========================================================= */
+  
+  .red-glow {
+    position: absolute;
+  
+    border-radius: 50%;
+  
+    filter: blur(100px);
+  
+    opacity: 0.28;
+  }
+  
+  .glow-1 {
+    width: 400px;
+    height: 400px;
+  
+    top: -180px;
+    left: -120px;
+  
+    background: rgba(30, 120, 255, 0.65);
+  }
+  
+  .glow-2 {
+    width: 500px;
+    height: 500px;
+  
+    right: -220px;
+    bottom: -250px;
+  
+    background: rgba(20, 80, 220, 0.55);
+  }
+  
+  .glow-3 {
+    width: 300px;
+    height: 300px;
+  
+    left: 50%;
+    top: 45%;
+  
+    transform: translate(-50%, -50%);
+  
+    background: rgba(30, 130, 255, 0.20);
+  
+    filter: blur(120px);
+  }
+  
+  
+  /* =========================================================
+     GRID
+  ========================================================= */
+  
+  .login-bg::before {
+    content: "";
+  
+    position: absolute;
+    inset: 0;
+  
+    opacity: 0.22;
+  
+    background-image:
+      linear-gradient(
+        rgba(70, 150, 255, 0.045) 1px,
+        transparent 1px
+      ),
+      linear-gradient(
+        90deg,
+        rgba(70, 150, 255, 0.045) 1px,
+        transparent 1px
+      );
+  
+    background-size: 55px 55px;
+  }
+  
+  
+  /* =========================================================
+     CIRCUIT LINES
+  ========================================================= */
+  
+  .circuit {
+    position: absolute;
+  
+    width: 230px;
+    height: 150px;
+  
+    opacity: 0.75;
+  }
+  
+  .circuit span {
+    position: absolute;
+  
+    display: block;
+  
+    background: rgba(80, 160, 255, 0.60);
+  
+    box-shadow:
+      0 0 8px rgba(40, 130, 255, 0.70);
+  }
+  
+  .circuit span:nth-child(1) {
+    height: 1px;
+    width: 180px;
+  
+    top: 40px;
+    left: 0;
+  }
+  
+  .circuit span:nth-child(2) {
+    width: 1px;
+    height: 90px;
+  
+    top: 40px;
+    left: 0;
+  }
+  
+  .circuit span:nth-child(3) {
+    width: 7px;
+    height: 7px;
+  
+    border-radius: 50%;
+  
+    top: 37px;
+    left: 176px;
+  
+    background: #55aaff;
+  
+    box-shadow:
+      0 0 8px #268cff,
+      0 0 18px rgba(30, 130, 255, 0.70);
+  }
+  
+  .circuit-left-top {
+    top: 10%;
+    left: 0;
+  }
+  
+  .circuit-left-bottom {
+    bottom: 13%;
+    left: 0;
+  
+    transform: scaleY(-1);
+  }
+  
+  .circuit-right-top {
+    top: 10%;
+    right: 0;
+  
+    transform: scaleX(-1);
+  }
+  
+  .circuit-right-bottom {
+    bottom: 13%;
+    right: 0;
+  
+    transform: scale(-1);
+  }
+  
+  
+  /* =========================================================
+     VERTICAL LINES
+  ========================================================= */
+  
+  .vertical-line {
+    position: absolute;
+  
+    width: 1px;
+    height: 65%;
+  
+    top: 17%;
+  
+    background:
+      linear-gradient(
+        to bottom,
+        transparent,
+        rgba(60, 150, 255, 0.50),
+        transparent
+      );
+  
+    box-shadow:
+      0 0 8px rgba(30, 130, 255, 0.20);
+  }
+  
+  .line-left {
+    left: 27px;
+  }
+  
+  .line-right {
+    right: 27px;
+  }
+  
+  
+  /* =========================================================
+     PARTICLES
+  ========================================================= */
+  
+  .background-particles i {
+    position: absolute;
+  
+    width: 2px;
+    height: 2px;
+  
+    border-radius: 50%;
+  
+    background: #58aaff;
+  
+    box-shadow:
+      0 0 7px #268cff;
+  
+    opacity: 0.6;
+  
+    animation: particleFloat 5s ease-in-out infinite;
+  }
+  
+  .background-particles i:nth-child(1) {
+    top: 15%;
+    left: 15%;
+  }
+  
+  .background-particles i:nth-child(2) {
+    top: 28%;
+    left: 82%;
+  }
+  
+  .background-particles i:nth-child(3) {
+    top: 75%;
+    left: 18%;
+  }
+  
+  .background-particles i:nth-child(4) {
+    top: 83%;
+    left: 77%;
+  }
+  
+  .background-particles i:nth-child(5) {
+    top: 48%;
+    left: 7%;
+  }
+  
+  .background-particles i:nth-child(6) {
+    top: 57%;
+    left: 92%;
+  }
+  
+  .background-particles i:nth-child(7) {
+    top: 20%;
+    left: 50%;
+  }
+  
+  .background-particles i:nth-child(8) {
+    top: 90%;
+    left: 48%;
+  }
+  
+  @keyframes particleFloat {
+    0%,
+    100% {
+      opacity: 0.25;
+      transform: translateY(0);
+    }
+  
+    50% {
+      opacity: 0.85;
+      transform: translateY(-10px);
+    }
+  }
+  
+  
+  /* =========================================================
+     MAIN WINDOW
+  ========================================================= */
+  
+  .login-window {
+    width: min(1040px, 100%);
+  
+    position: relative;
+    z-index: 5;
+  
+    overflow: hidden;
+  
+    border-radius: 10px;
+  
+    border: 1px solid rgba(90, 170, 255, 0.28);
+  
+    background:
+      linear-gradient(
+        145deg,
+        rgba(15, 45, 75, 0.48),
+        rgba(5, 15, 25, 0.72)
+      );
+  
+    box-shadow:
+      0 35px 100px rgba(0, 0, 0, 0.75),
+      0 0 70px rgba(30, 130, 255, 0.10),
+      inset 0 1px rgba(255, 255, 255, 0.08);
+  
+    backdrop-filter: blur(25px);
+    -webkit-backdrop-filter: blur(25px);
+  }
+  
+  
+  /* =========================================================
+     TOP BAR
+  ========================================================= */
+  
+  .window-bar {
+    height: 39px;
+  
+    display: flex;
+    align-items: center;
+  
+    padding: 0 14px;
+  
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+  
+    background: rgba(3, 7, 13, 0.85);
+  }
+  
+  .window-dots {
+    display: flex;
+    gap: 6px;
+  
+    width: 90px;
+  }
+  
+  .window-dot {
+    width: 8px;
+    height: 8px;
+  
+    border-radius: 50%;
+  }
+  
+  .window-dot.red {
+    background: #ff5f57;
+  }
+  
+  .window-dot.yellow {
+    background: #febc2e;
+  }
+  
+  .window-dot.green {
+    background: #28c840;
+  }
+  
+  .window-name {
+    position: absolute;
+  
+    left: 50%;
+  
+    transform: translateX(-50%);
+  
+    font-family: monospace;
+  
+    font-size: 9px;
+  
+    letter-spacing: 0.18em;
+  
+    color: rgba(255,255,255,0.38);
+  }
+  
+  .window-status {
+    margin-left: auto;
+  
+    display: flex;
+    align-items: center;
+  
+    gap: 6px;
+  
+    font-family: monospace;
+  
+    font-size: 7px;
+  
+    letter-spacing: 0.1em;
+  
+    color: rgba(255,255,255,0.28);
+  }
+  
+  .window-status span {
+    width: 5px;
+    height: 5px;
+  
+    border-radius: 50%;
+  
+    background: #48a5ff;
+  
+    box-shadow:
+      0 0 8px #248dff;
+  }
+  
+  
+  /* =========================================================
+     CONTENT
+  ========================================================= */
+  
+  .login-content {
+    min-height: 485px;
+  
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  
+    padding: 55px 40px;
+  
+    position: relative;
+  }
+  
+  
+  /* =========================================================
+     LOGIN CARD
+  ========================================================= */
+  
+  .login-card {
+    width: 560px;
+    height: 310px;
+  
+    display: flex;
+  
+    position: relative;
+  
+    border-radius: 8px;
+  
+    overflow: hidden;
+  
+    border: 1px solid rgba(80, 160, 255, 0.28);
+  
+    background:
+      linear-gradient(
+        135deg,
+        rgba(18, 52, 85, 0.82),
+        rgba(5, 18, 32, 0.88)
+      );
+  
+    box-shadow:
+      0 25px 65px rgba(0,0,0,0.55),
+      0 0 35px rgba(30,130,255,0.08);
+  }
+  
+  
+  /* =========================================================
+     LEFT FORM
+  ========================================================= */
+  
+  .login-form-side {
+    width: 50%;
+  
+    position: relative;
+    z-index: 2;
+  
+    display: flex;
+    align-items: center;
+  
+    background:
+      linear-gradient(
+        135deg,
+        rgba(12, 38, 65, 0.94),
+        rgba(4, 15, 27, 0.97)
+      );
+  }
+  
+  .form-inner {
+    width: 100%;
+    padding: 30px 27px;
+  }
+  
+  .form-top-label {
+    font-size: 7px;
+  
+    letter-spacing: 0.23em;
+  
+    color: rgba(100, 180, 255, 0.60);
+  
+    margin-bottom: 6px;
+  }
+  
+  .form-inner h1 {
+    margin: 0;
+  
+    font-size: 18px;
+  
+    font-weight: 600;
+  
+    letter-spacing: -0.02em;
+  }
+  
+  .form-line {
+    width: 35px;
+    height: 1px;
+  
+    margin: 8px 0 19px;
+  
+    background: #4da6ff;
+  
+    box-shadow:
+      0 0 9px rgba(45, 145, 255, 0.65);
+  }
+  
+  
+  /* =========================================================
+     INPUTS
+  ========================================================= */
+  
+  .input-group {
+    margin-bottom: 12px;
+  }
+  
+  .input-group label {
+    display: block;
+  
+    margin-bottom: 5px;
+  
+    font-size: 6px;
+  
+    letter-spacing: 0.18em;
+  
+    color: rgba(255,255,255,0.32);
+  }
+  
+  .login-input {
+    height: 32px;
+  
+    display: flex;
+    align-items: center;
+  
+    border-radius: 5px;
+  
+    border: 1px solid rgba(255,255,255,0.09);
+  
+    background: rgba(0,0,0,0.28);
+  
+    transition:
+      border-color 0.25s ease,
+      box-shadow 0.25s ease,
+      background 0.25s ease;
+  }
+  
+  .login-input:focus-within {
+    border-color: rgba(65, 160, 255, 0.55);
+  
+    background: rgba(255,255,255,0.035);
+  
+    box-shadow:
+      0 0 0 2px rgba(30,130,255,0.07),
+      0 0 18px rgba(30,130,255,0.08);
+  }
+  
+  .input-icon {
+    width: 30px;
+  
+    display: flex;
+    justify-content: center;
+  
+    color: rgba(90, 175, 255, 0.55);
+  
+    font-size: 10px;
+  }
+  
+  .login-input input {
+    width: 100%;
+    height: 100%;
+  
+    padding: 0 9px 0 0;
+  
+    border: none;
+    outline: none;
+  
+    background: transparent;
+  
+    color: white;
+  
+    font-size: 8px;
+  
+    font-family: inherit;
+  }
+  
+  .login-input input::placeholder {
+    color: rgba(255,255,255,0.23);
+  }
+  
+  
+  /* =========================================================
+     ERROR
+  ========================================================= */
+  
+  .login-error {
+    margin: 7px 0;
+  
+    padding: 7px 8px;
+  
+    border-radius: 4px;
+  
+    border: 1px solid rgba(255,80,100,0.16);
+  
+    background: rgba(255,60,80,0.07);
+  
+    color: #ff98a6;
+  
+    font-size: 7px;
+  
+    line-height: 1.35;
+  }
+  
+  
+  /* =========================================================
+     BUTTON
+  ========================================================= */
+  
+  .login-submit {
+    width: 100%;
+    height: 31px;
+  
+    margin-top: 4px;
+  
+    border: none;
+    border-radius: 18px;
+  
+    cursor: pointer;
+  
+    color: white;
+  
+    font-size: 7px;
+    font-weight: 600;
+  
+    background:
+      linear-gradient(
+        90deg,
+        #238cff,
+        #55b0ff
+      );
+  
+    box-shadow:
+      0 7px 18px rgba(30,130,255,0.24),
+      inset 0 1px rgba(255,255,255,0.28);
+  
+    transition:
+      transform 0.2s ease,
+      filter 0.2s ease,
+      box-shadow 0.2s ease;
+  }
+  
+  .login-submit:hover {
+    transform: translateY(-1px);
+  
+    filter: brightness(1.08);
+  
+    box-shadow:
+      0 10px 25px rgba(30,130,255,0.34),
+      inset 0 1px rgba(255,255,255,0.32);
+  }
+  
+  .login-submit:active {
+    transform: translateY(0);
+  }
+  
+  .login-submit:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+    transform: none;
+  }
+  
+  
+  /* =========================================================
+     LINKS
+  ========================================================= */
+  
+  .form-links {
+    display: flex;
+    justify-content: center;
+    gap: 4px;
+  
+    margin-top: 11px;
+  
+    font-size: 6px;
+  
+    color: rgba(255,255,255,0.30);
+  }
+  
+  .form-links a {
+    color: #63b5ff;
+  
+    text-decoration: none;
+  }
+  
+  .form-links a:hover {
+    color: #a7d8ff;
+  }
+  
+  .forgot-link {
+    display: block;
+  
+    margin-top: 7px;
+  
+    text-align: center;
+  
+    color: rgba(90, 175, 255, 0.52);
+  
+    font-size: 6px;
+  
+    text-decoration: none;
+  }
+  
+  .forgot-link:hover {
+    color: #8bcaff;
+  }
+  
+  
+  /* =========================================================
+     WELCOME SIDE
+  ========================================================= */
+  
+  .welcome-side {
+    width: 50%;
+  
+    position: relative;
+  
+    overflow: hidden;
+  
+    background:
+      linear-gradient(
+        135deg,
+        rgba(15, 65, 110, 0.72),
+        rgba(20, 75, 125, 0.20)
+      );
+  }
+  
+  .welcome-shape {
+    position: absolute;
+  
+    inset: -30px -60px -30px 0;
+  
+    background:
+      linear-gradient(
+        105deg,
+        rgba(3,8,14,0.82) 0%,
+        rgba(4,12,20,0.78) 48%,
+        rgba(30,120,220,0.16) 49%,
+        rgba(30,120,220,0.16) 100%
+      );
+  
+    clip-path: polygon(
+      0 0,
+      48% 0,
+      38% 100%,
+      0 100%
+    );
+  
+    z-index: 1;
+  }
+  
+  .welcome-side::before {
+    content: "";
+  
+    position: absolute;
+  
+    top: -20px;
+    left: 47%;
+  
+    width: 1px;
+    height: 350px;
+  
+    transform: rotate(15deg);
+  
+    background:
+      linear-gradient(
+        to bottom,
+        transparent,
+        rgba(70, 160, 255, 0.30),
+        transparent
+      );
+  
+    z-index: 3;
+  }
+  
+  .welcome-content {
+    position: absolute;
+  
+    inset: 0;
+  
+    z-index: 5;
+  
+    display: flex;
+  
+    flex-direction: column;
+  
+    align-items: center;
+  
+    justify-content: center;
+  
+    text-align: center;
+  
+    padding: 25px;
+  }
+  
+  .welcome-small {
+    margin-bottom: 9px;
+  
+    font-size: 6px;
+  
+    letter-spacing: 0.28em;
+  
+    color: rgba(100, 185, 255, 0.62);
+  }
+  
+  .welcome-content h2 {
+    margin: 0;
+  
+    font-size: 20px;
+  
+    line-height: 1.12;
+  
+    font-weight: 700;
+  
+    text-shadow:
+      0 0 25px rgba(50, 150, 255, 0.15);
+  }
+  
+  .welcome-divider {
+    width: 28px;
+    height: 1px;
+  
+    margin: 12px 0;
+  
+    background: rgba(90, 175, 255, 0.65);
+  
+    box-shadow:
+      0 0 10px rgba(40, 140, 255, 0.50);
+  }
+  
+  .welcome-content p {
+    margin: 0;
+  
+    color: rgba(255,255,255,0.40);
+  
+    font-size: 6px;
+  
+    line-height: 1.7;
+  }
+  
+  
+  /* =========================================================
+     ORBIT
+  ========================================================= */
+  
+  .welcome-orbit {
+    width: 35px;
+    height: 35px;
+  
+    margin-top: 17px;
+  
+    border-radius: 50%;
+  
+    border: 1px solid rgba(70, 160, 255, 0.20);
+  
+    position: relative;
+  
+    opacity: 0.65;
+  }
+  
+  .welcome-orbit::before {
+    content: "";
+  
+    position: absolute;
+  
+    inset: 7px;
+  
+    border-radius: 50%;
+  
+    border: 1px solid rgba(70, 160, 255, 0.18);
+  }
+  
+  .orbit-dot {
+    position: absolute;
+  
+    width: 4px;
+    height: 4px;
+  
+    top: 2px;
+    left: 50%;
+  
+    transform: translateX(-50%);
+  
+    border-radius: 50%;
+  
+    background: #55adff;
+  
+    box-shadow:
+      0 0 8px #238cff;
+  }
+  
+  
+  /* =========================================================
+     CODE FOOTER
+  ========================================================= */
+  
+  .code-footer {
+    border-top: 1px solid rgba(255,255,255,0.09);
+  
+    background:
+      rgba(3,7,13,0.90);
+  
+    font-family:
+      "SFMono-Regular",
+      Consolas,
+      "Liberation Mono",
+      monospace;
+  }
+  
+  .code-header {
+    height: 29px;
+  
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  
+    padding: 0 12px;
+  
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+  
+  .code-file {
+    display: flex;
+    align-items: center;
+  
+    gap: 6px;
+  
+    color: rgba(255,255,255,0.42);
+  
+    font-size: 7px;
+  }
+  
+  .html-symbol {
+    color: #5aaeff;
+    font-weight: 700;
+  }
+  
+  .code-actions {
+    display: flex;
+    align-items: center;
+  
+    gap: 8px;
+  
+    font-size: 5px;
+  
+    color: rgba(255,255,255,0.22);
+  }
+  
+  .code-actions b {
+    color: rgba(80, 165, 255, 0.65);
+  }
+  
+  
+  /* =========================================================
+     CODE BODY
+  ========================================================= */
+  
+  .code-body {
+    min-height: 145px;
+  
+    padding: 13px 15px;
+  
+    overflow: hidden;
+  }
+  
+  .code-line {
+    height: 14px;
+  
+    white-space: nowrap;
+  
+    font-size: 7px;
+  
+    line-height: 14px;
+  
+    color: rgba(255,255,255,0.48);
+  }
+  
+  .code-line.empty {
+    height: 8px;
+  }
+  
+  .code-line.indent {
+    padding-left: 18px;
+  }
+  
+  .code-line.indent-2 {
+    padding-left: 36px;
+  }
+  
+  .number {
+    display: inline-block;
+  
+    width: 28px;
+  
+    color: rgba(255,255,255,0.13);
+  }
+  
+  .purple {
+    color: #c993ff;
+  }
+  
+  .yellow {
+    color: #ffd77c;
+  }
+  
+  .green {
+    color: #83d6a5;
+  }
+  
+  .blue {
+    color: #72b8ff;
+  }
+  
+  .pink {
+    color: #ff9ac5;
+  }
+  
+  .white {
+    color: rgba(255,255,255,0.52);
+  }
+  
+  .red-code {
+    color: #65b4ff;
+  }
+  
+  
+  /* =========================================================
+     BRAND
+  ========================================================= */
+  
+  .page-brand {
+    position: fixed;
+  
+    left: 22px;
+    bottom: 17px;
+  
+    z-index: 10;
+  
+    display: flex;
+    align-items: center;
+  
+    gap: 7px;
+  
+    font-size: 7px;
+  
+    letter-spacing: 0.16em;
+  
+    color: rgba(255,255,255,0.22);
+  }
+  
+  .brand-dot {
+    width: 5px;
+    height: 5px;
+  
+    border-radius: 50%;
+  
+    background: #55aaff;
+  
+    box-shadow:
+      0 0 8px #238cff;
+  }
+  
+  .page-version {
+    position: fixed;
+  
+    right: 22px;
+    bottom: 17px;
+  
+    z-index: 10;
+  
+    font-family: monospace;
+  
+    font-size: 7px;
+  
+    color: rgba(255,255,255,0.17);
+  }
+  
+  
+  /* =========================================================
+     TABLET
+  ========================================================= */
+  
+  @media (max-width: 800px) {
+  
+    .login-page {
+      padding: 35px 18px;
+    }
+  
+    .login-content {
+      padding: 45px 25px;
+    }
+  
+    .login-card {
+      width: 540px;
+    }
+  
+    .code-footer {
+      display: none;
+    }
+  
+    .login-window {
+      width: 100%;
+    }
+  }
+  
+  
+  /* =========================================================
+     MOBILE
+  ========================================================= */
+  
+  @media (max-width: 600px) {
+  
+    .login-page {
+      min-height: 100svh;
+      padding: 15px 10px;
+    }
+  
+    .login-window {
+      border-radius: 9px;
+    }
+  
+    .window-bar {
+      height: 36px;
+    }
+  
+    .window-name {
+      font-size: 7px;
+      letter-spacing: 0.1em;
+    }
+  
+    .window-status {
+      display: none;
+    }
+  
+    .login-content {
+      min-height: auto;
+      padding: 30px 15px;
+    }
+  
+    .login-card {
+      width: 100%;
+      height: auto;
+      min-height: 440px;
+  
+      flex-direction: column;
+    }
+  
+    .login-form-side {
+      width: 100%;
+      min-height: 260px;
+    }
+  
+    .welcome-side {
+      width: 100%;
+      min-height: 180px;
+    }
+  
+    .welcome-shape {
+      inset: -40px -20px 0 -20px;
+  
+      clip-path: polygon(
+        0 0,
+        100% 0,
+        100% 42%,
+        0 65%
+      );
+    }
+  
+    .welcome-side::before {
+      display: none;
+    }
+  
+    .welcome-content {
+      padding: 20px;
+    }
+  
+    .welcome-content h2 {
+      font-size: 18px;
+    }
+  
+    .welcome-content p {
+      font-size: 6px;
+    }
+  
+    .welcome-orbit {
+      margin-top: 10px;
+    }
+  
+    .form-inner {
+      padding: 28px 25px;
+    }
+  
+    .login-input {
+      height: 36px;
+    }
+  
+    .login-submit {
+      height: 34px;
+    }
+  
+    .page-brand,
+    .page-version {
+      display: none;
+    }
+  
+    .circuit {
+      opacity: 0.35;
+    }
+  
+    .vertical-line {
+      opacity: 0.25;
+    }
+  }
+  
+  
+  /* =========================================================
+     SMALL PHONES
+  ========================================================= */
+  
+  @media (max-width: 380px) {
+  
+    .login-page {
+      padding: 8px;
+    }
+  
+    .login-content {
+      padding: 22px 10px;
+    }
+  
+    .login-card {
+      min-height: 420px;
+    }
+  
+    .login-form-side {
+      min-height: 250px;
+    }
+  
+    .welcome-side {
+      min-height: 170px;
+    }
+  
+    .form-inner {
+      padding: 25px 20px;
+    }
+  
+    .form-inner h1 {
+      font-size: 17px;
+    }
+  
+    .welcome-content h2 {
+      font-size: 17px;
+    }
+  }
+  
+  
+  /* =========================================================
+     REDUCED MOTION
+  ========================================================= */
+  
+  @media (prefers-reduced-motion: reduce) {
+  
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }

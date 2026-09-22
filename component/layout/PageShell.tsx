@@ -8,6 +8,7 @@ type PageShellProps = {
   children: ReactNode;
   backHref?: string;
   backLabel?: string;
+  className?: string;
 };
 
 export default function PageShell({
@@ -17,9 +18,10 @@ export default function PageShell({
   children,
   backHref = "/",
   backLabel = "Back to Home",
+  className = "",
 }: PageShellProps) {
   return (
-    <main className="page-shell">
+    <main className={`page-shell ${className}`.trim()}>
       <Link href={backHref} className="back-home glass">
         <span>←</span>
         <span>{backLabel}</span>

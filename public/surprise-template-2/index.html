@@ -1,0 +1,854 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>THE BOX — Birthday Edition</title>
+
+  <meta
+    name="description"
+    content="A little birthday mystery, made especially for you."
+  />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+  <link
+    href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap"
+    rel="stylesheet"
+  />
+
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+
+  <!-- =========================================
+       AMBIENT BACKGROUND
+  ========================================== -->
+
+  <div class="ambient ambient-one"></div>
+  <div class="ambient ambient-two"></div>
+  <div class="ambient ambient-three"></div>
+
+  <div class="grain"></div>
+
+  <div id="stars"></div>
+
+  <!-- =========================================
+       TOP BAR
+  ========================================== -->
+
+  <header class="topbar">
+
+    <div class="brand">
+      <span class="brand-dot"></span>
+      <span>THE BOX</span>
+    </div>
+
+    <div class="edition">
+      <span class="edition-dot"></span>
+      BIRTHDAY EDITION
+    </div>
+
+  </header>
+
+
+  <main>
+
+    <!-- =========================================
+         SCREEN 1 — INTRO
+    ========================================== -->
+
+    <section class="screen active" id="introScreen">
+
+      <div class="intro-content">
+
+        <div class="eyebrow">
+          <span></span>
+          A LITTLE BIRTHDAY SECRET
+          <span></span>
+        </div>
+
+
+        <div class="box-orb">
+
+          <div class="orb-ring ring-one"></div>
+          <div class="orb-ring ring-two"></div>
+          <div class="orb-ring ring-three"></div>
+
+          <div class="gift-box">
+
+            <div class="gift-lid"></div>
+
+            <div class="gift-body">
+              <div class="gift-ribbon vertical"></div>
+              <div class="gift-ribbon horizontal"></div>
+            </div>
+
+            <div class="gift-bow">
+              <span class="bow-left"></span>
+              <span class="bow-right"></span>
+              <span class="bow-center"></span>
+            </div>
+
+          </div>
+
+          <div class="orb-sparkle sparkle-a">✦</div>
+          <div class="orb-sparkle sparkle-b">✦</div>
+          <div class="orb-sparkle sparkle-c">✧</div>
+
+        </div>
+
+
+        <div class="intro-copy">
+
+          <p class="mini-label">SOMETHING WAS LEFT HERE FOR YOU</p>
+
+          <h1>
+            YOU FOUND
+            <span>THE BOX.</span>
+          </h1>
+
+          <p class="intro-description">
+            A tiny little mystery filled with memories,
+            music, messages and one final birthday surprise.
+          </p>
+
+        </div>
+
+
+        <button class="primary-button" id="enterButton">
+          <span>ENTER THE BOX</span>
+          <b>→</b>
+        </button>
+
+
+        <div class="scroll-note">
+          <span class="scroll-line"></span>
+          TAKE YOUR TIME
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- =========================================
+         SCREEN 2 — ACCESS
+    ========================================== -->
+
+    <section class="screen" id="accessScreen">
+
+      <div class="center-layout">
+
+        <div class="section-kicker">
+          <span class="kicker-number">01</span>
+          PRIVATE ACCESS
+        </div>
+
+        <div class="glass-panel access-panel">
+
+          <div class="panel-glow"></div>
+
+          <div class="lock-icon">
+            <span>✦</span>
+          </div>
+
+          <p class="panel-label">BIRTHDAY ACCESS REQUIRED</p>
+
+          <h2>
+            Enter the
+            <span>secret code.</span>
+          </h2>
+
+          <p class="panel-description">
+            Four little numbers stand between you
+            and what is waiting inside.
+          </p>
+
+
+          <div class="code-inputs">
+
+            <input
+              type="text"
+              maxlength="1"
+              inputmode="numeric"
+              autocomplete="off"
+              aria-label="First digit"
+            />
+
+            <input
+              type="text"
+              maxlength="1"
+              inputmode="numeric"
+              autocomplete="off"
+              aria-label="Second digit"
+            />
+
+            <input
+              type="text"
+              maxlength="1"
+              inputmode="numeric"
+              autocomplete="off"
+              aria-label="Third digit"
+            />
+
+            <input
+              type="text"
+              maxlength="1"
+              inputmode="numeric"
+              autocomplete="off"
+              aria-label="Fourth digit"
+            />
+
+          </div>
+
+
+          <p class="code-error" id="codeError">
+            That's not the right little secret. Try again.
+          </p>
+
+
+          <button class="glass-button" id="unlockButton">
+            UNLOCK
+            <span>✦</span>
+          </button>
+
+
+          <div class="code-hint">
+            ENTER THE 4 DIGIT CODE
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- =========================================
+         SCREEN 3 — FRAGMENTS
+    ========================================== -->
+
+    <section class="screen" id="fragmentsScreen">
+
+      <div class="page-container">
+
+        <div class="section-heading">
+
+          <div>
+            <div class="section-kicker">
+              <span class="kicker-number">02</span>
+              LITTLE FRAGMENTS
+            </div>
+
+            <h2>
+              A few things
+              <span>saved for today.</span>
+            </h2>
+
+            <p>
+              Open them one by one.
+              Some things are meant to be discovered slowly.
+            </p>
+          </div>
+
+          <div class="heading-decoration">
+            <span>✦</span>
+            <small>FOR YOU</small>
+          </div>
+
+        </div>
+
+
+        <div class="fragment-grid">
+
+          <button
+            class="fragment"
+            data-fragment="memory"
+          >
+            <div class="fragment-number">01</div>
+
+            <div class="fragment-icon">◌</div>
+
+            <div class="fragment-text">
+              <strong>MEMORY</strong>
+              <span>A little moment</span>
+            </div>
+
+            <div class="fragment-arrow">↗</div>
+          </button>
+
+
+          <button
+            class="fragment"
+            data-fragment="question"
+          >
+            <div class="fragment-number">02</div>
+
+            <div class="fragment-icon">?</div>
+
+            <div class="fragment-text">
+              <strong>QUESTION</strong>
+              <span>Something to think about</span>
+            </div>
+
+            <div class="fragment-arrow">↗</div>
+          </button>
+
+
+          <button
+            class="fragment"
+            data-fragment="secret"
+          >
+            <div class="fragment-number">03</div>
+
+            <div class="fragment-icon">✦</div>
+
+            <div class="fragment-text">
+              <strong>SECRET</strong>
+              <span>A tiny hidden thing</span>
+            </div>
+
+            <div class="fragment-arrow">↗</div>
+          </button>
+
+
+          <button
+            class="fragment"
+            data-fragment="sound"
+          >
+            <div class="fragment-number">04</div>
+
+            <div class="fragment-icon">♫</div>
+
+            <div class="fragment-text">
+              <strong>SOUND</strong>
+              <span>A little atmosphere</span>
+            </div>
+
+            <div class="fragment-arrow">↗</div>
+          </button>
+
+
+          <button
+            class="fragment"
+            data-fragment="message"
+          >
+            <div class="fragment-number">05</div>
+
+            <div class="fragment-icon">♡</div>
+
+            <div class="fragment-text">
+              <strong>MESSAGE</strong>
+              <span>Words saved for you</span>
+            </div>
+
+            <div class="fragment-arrow">↗</div>
+          </button>
+
+        </div>
+
+
+        <button class="bottom-button" id="fragmentContinue">
+          KEEP GOING
+          <span>→</span>
+        </button>
+
+      </div>
+
+    </section>
+
+
+    <!-- =========================================
+         SCREEN 4 — MIRROR
+    ========================================== -->
+
+    <section class="screen" id="mirrorScreen">
+
+      <div class="center-layout">
+
+        <div class="section-kicker">
+          <span class="kicker-number">03</span>
+          LOOK CLOSER
+        </div>
+
+
+        <div class="mirror-wrap">
+
+          <div class="mirror-aura"></div>
+
+          <div class="mirror">
+
+            <div class="mirror-noise"></div>
+
+            <div class="mirror-center">
+              <span class="mirror-star">✦</span>
+
+              <p>MOVE CLOSER</p>
+
+              <h2>
+                THERE IS
+                <span>MORE HERE.</span>
+              </h2>
+
+              <div class="mirror-message" id="mirrorMessage">
+                today is a little more special
+                because it belongs to you.
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <p class="mirror-hint">
+          Move your cursor around the glass
+          <span>•</span>
+          or touch it on mobile
+        </p>
+
+
+        <button class="bottom-button" id="mirrorContinue">
+          NEXT FRAGMENT
+          <span>→</span>
+        </button>
+
+      </div>
+
+    </section>
+
+
+    <!-- =========================================
+         SCREEN 5 — FREQUENCY
+    ========================================== -->
+
+    <section class="screen" id="frequencyScreen">
+
+      <div class="center-layout">
+
+        <div class="section-kicker">
+          <span class="kicker-number">04</span>
+          BIRTHDAY FREQUENCY
+        </div>
+
+
+        <div class="frequency-panel glass-panel">
+
+          <div class="frequency-top">
+
+            <div>
+              <p class="panel-label">A LITTLE SOUND FOR TODAY</p>
+
+              <h2>
+                Press play.
+                <span>Let it glow.</span>
+              </h2>
+            </div>
+
+            <div class="frequency-badge">
+              <span></span>
+              LIVE
+            </div>
+
+          </div>
+
+
+          <div class="waveform" id="waveform">
+
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+
+          </div>
+
+
+          <div class="frequency-player">
+
+            <button id="frequencyButton" class="play-button">
+              <span>▶</span>
+            </button>
+
+            <div class="track-info">
+              <strong>A LITTLE SONG FOR YOU</strong>
+              <span>birthday frequency / 01</span>
+            </div>
+
+            <div class="frequency-time">
+              00:00
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <button class="bottom-button" id="frequencyContinue">
+          OPEN THE ARCHIVE
+          <span>→</span>
+        </button>
+
+      </div>
+
+    </section>
+
+
+    <!-- =========================================
+         SCREEN 6 — ARCHIVE
+    ========================================== -->
+
+    <section class="screen" id="archiveScreen">
+
+      <div class="page-container">
+
+        <div class="section-heading">
+
+          <div>
+
+            <div class="section-kicker">
+              <span class="kicker-number">05</span>
+              THE ARCHIVE
+            </div>
+
+            <h2>
+              Things worth
+              <span>keeping.</span>
+            </h2>
+
+            <p>
+              Little snapshots from a little universe.
+            </p>
+
+          </div>
+
+        </div>
+
+
+        <div class="archive-grid">
+
+          <button class="archive-card" data-archive="01">
+
+            <div class="archive-image archive-one">
+              <span>✦</span>
+            </div>
+
+            <div class="archive-meta">
+              <span>ARCHIVE 01</span>
+              <strong>A SMALL MOMENT</strong>
+            </div>
+
+          </button>
+
+
+          <button class="archive-card" data-archive="02">
+
+            <div class="archive-image archive-two">
+              <span>♡</span>
+            </div>
+
+            <div class="archive-meta">
+              <span>ARCHIVE 02</span>
+              <strong>ONE OF THOSE DAYS</strong>
+            </div>
+
+          </button>
+
+
+          <button class="archive-card" data-archive="03">
+
+            <div class="archive-image archive-three">
+              <span>✧</span>
+            </div>
+
+            <div class="archive-meta">
+              <span>ARCHIVE 03</span>
+              <strong>KEEP THIS ONE</strong>
+            </div>
+
+          </button>
+
+        </div>
+
+
+        <button class="bottom-button" id="archiveContinue">
+          THERE'S ONE MORE
+          <span>→</span>
+        </button>
+
+      </div>
+
+    </section>
+
+
+    <!-- =========================================
+         SCREEN 7 — MESSAGE
+    ========================================== -->
+
+    <section class="screen" id="messageScreen">
+
+      <div class="center-layout">
+
+        <div class="section-kicker">
+          <span class="kicker-number">06</span>
+          UNSENT MESSAGE
+        </div>
+
+
+        <div class="message-scene">
+
+          <div class="message-glow"></div>
+
+          <div class="envelope">
+
+            <div class="envelope-back"></div>
+
+            <div class="letter-paper">
+
+              <div class="letter-top">
+                <span>FOR YOU</span>
+                <span>✦</span>
+              </div>
+
+              <h3>
+                A little
+                <span>birthday note.</span>
+              </h3>
+
+              <p>
+                I hope today gives you plenty of reasons
+                to smile, laugh and make another beautiful
+                memory.
+              </p>
+
+              <div class="letter-sign">
+                MADE WITH A LOT OF THOUGHT
+              </div>
+
+            </div>
+
+            <div class="envelope-front"></div>
+
+          </div>
+
+        </div>
+
+
+        <p class="message-hint">
+          One last door is waiting.
+        </p>
+
+
+        <button class="bottom-button" id="messageContinue">
+          OPEN IT
+          <span>→</span>
+        </button>
+
+      </div>
+
+    </section>
+
+
+    <!-- =========================================
+         SCREEN 8 — CORE
+    ========================================== -->
+
+    <section class="screen" id="coreScreen">
+
+      <div class="center-layout">
+
+        <div class="section-kicker">
+          <span class="kicker-number">07</span>
+          THE CORE
+        </div>
+
+
+        <div class="core-scene">
+
+          <div class="core-orbit orbit-one"></div>
+          <div class="core-orbit orbit-two"></div>
+          <div class="core-orbit orbit-three"></div>
+
+          <div class="core">
+
+            <div class="core-inner">
+              <span>✦</span>
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <div class="core-copy">
+
+          <p>EVERYTHING LEADS HERE</p>
+
+          <h2>
+            One last
+            <span>surprise.</span>
+          </h2>
+
+          <button class="primary-button" id="revealButton">
+            OPEN THE BOX
+            <b>✦</b>
+          </button>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- =========================================
+         SCREEN 9 — FINAL
+    ========================================== -->
+
+    <section class="screen" id="finalScreen">
+
+      <div id="confettiLayer"></div>
+
+      <div class="final-glow"></div>
+
+      <div class="final-content">
+
+        <div class="final-sparkles">
+          <span>✦</span>
+          <span>✧</span>
+          <span>✦</span>
+          <span>✧</span>
+          <span>✦</span>
+        </div>
+
+
+        <p class="final-eyebrow">
+          THE BOX IS OPEN
+        </p>
+
+
+        <h1>
+          HAPPY
+          <span>BIRTHDAY.</span>
+        </h1>
+
+
+        <div class="final-line"></div>
+
+
+        <p class="final-message">
+          May this new year of your life be filled with
+          tiny happy moments, unexpected smiles,
+          beautiful memories and everything good
+          that you deserve.
+        </p>
+
+
+        <div class="final-card">
+
+          <span class="final-card-star">✦</span>
+
+          <p>
+            THIS LITTLE UNIVERSE
+          </p>
+
+          <strong>
+            WAS MADE JUST FOR TODAY.
+          </strong>
+
+          <span class="final-card-star">✦</span>
+
+        </div>
+
+
+        <button class="restart-button" id="restartButton">
+          ↻ EXPERIENCE AGAIN
+        </button>
+
+      </div>
+
+    </section>
+
+  </main>
+
+
+  <!-- =========================================
+       FRAGMENT MODAL
+  ========================================== -->
+
+  <div class="fragment-modal" id="fragmentModal">
+
+    <div class="modal-backdrop"></div>
+
+    <div class="modal-card">
+
+      <button class="modal-close" id="modalClose">
+        ×
+      </button>
+
+      <div class="modal-number" id="modalNumber">
+        01
+      </div>
+
+      <div class="modal-icon" id="modalIcon">
+        ✦
+      </div>
+
+      <p class="modal-label">
+        FRAGMENT FOUND
+      </p>
+
+      <h3 id="modalTitle">
+        MEMORY
+      </h3>
+
+      <p id="modalDescription">
+        Something was waiting here.
+      </p>
+
+      <div class="modal-content" id="modalContent">
+        ✦
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- =========================================
+       AUDIO
+  ========================================== -->
+
+  <audio
+    id="frequencyAudio"
+    loop
+    preload="metadata"
+  >
+    <source src="music.mp3" type="audio/mpeg" />
+  </audio>
+
+
+  <script src="script.js"></script>
+
+</body>
+</html>

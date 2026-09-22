@@ -1,7 +1,12 @@
 import { createServerClient } from "@supabase/ssr";
-import { NextResponse, type NextRequest } from "next/server";
+import {
+  NextResponse,
+  type NextRequest,
+} from "next/server";
 
-export async function middleware(request: NextRequest) {
+export async function middleware(
+  request: NextRequest
+) {
   let response = NextResponse.next({
     request,
   });
@@ -18,7 +23,10 @@ export async function middleware(request: NextRequest) {
         setAll(cookiesToSet) {
           cookiesToSet.forEach(
             ({ name, value }) => {
-              request.cookies.set(name, value);
+              request.cookies.set(
+                name,
+                value
+              );
             }
           );
 
@@ -27,7 +35,11 @@ export async function middleware(request: NextRequest) {
           });
 
           cookiesToSet.forEach(
-            ({ name, value, options }) => {
+            ({
+              name,
+              value,
+              options,
+            }) => {
               response.cookies.set(
                 name,
                 value,
@@ -41,33 +53,92 @@ export async function middleware(request: NextRequest) {
   );
 
   /*
-   * IMPORTANT:
-   * This refreshes the Supabase auth session
-   * and keeps the auth cookies updated.
+   * Refresh Supabase authentication session.
    */
   const {
     data: { user },
   } = await supabase.auth.getUser();
 
+  const pathname =
+    request.nextUrl.pathname;
+
   /*
-   * Only protect /me.
+   * ============================================================
+   * PROTECT /me
+   * ============================================================
    */
-  if (
-    request.nextUrl.pathname === "/me" ||
-    request.nextUrl.pathname.startsWith("/me/")
-  ) {
-    if (!user) {
-      const loginUrl = request.nextUrl.clone();
 
-      loginUrl.pathname = "/login";
-      loginUrl.search = "";
-      loginUrl.searchParams.set(
-        "redirect",
-        "/me"
-      );
+  const isMeRoute =
+    pathname === "/me" ||
+    pathname.startsWith("/me/");
 
-      return NextResponse.redirect(loginUrl);
-    }
+  if (isMeRoute && !user) {
+    const loginUrl =
+      request.nextUrl.clone();
+
+    loginUrl.pathname = "/login";
+    loginUrl.search = "";
+
+    loginUrl.searchParams.set(
+      "redirect",
+      pathname
+    );
+
+    return NextResponse.redirect(
+      loginUrl
+    );
+  }
+
+  /*
+   * ============================================================
+   * ADMIN LOGIN
+   * ============================================================
+   *
+   * IMPORTANT:
+   * /admin/login must ALWAYS remain public.
+   *
+   * Do not redirect this route from middleware.
+   */
+
+  const isAdminLoginRoute =
+    pathname === "/admin/login";
+
+  if (isAdminLoginRoute) {
+    return response;
+  }
+
+  /*
+   * ============================================================
+   * PROTECT ADMIN ROUTES
+   * ============================================================
+   *
+   * Middleware only verifies authentication.
+   *
+   * Actual admin role verification must happen
+   * server-side inside requireAdmin().
+   */
+
+  const isAdminRoute =
+    pathname === "/admin" ||
+    pathname.startsWith("/admin/");
+
+  if (isAdminRoute && !user) {
+    const adminLoginUrl =
+      request.nextUrl.clone();
+
+    adminLoginUrl.pathname =
+      "/admin/login";
+
+    adminLoginUrl.search = "";
+
+    adminLoginUrl.searchParams.set(
+      "redirect",
+      pathname
+    );
+
+    return NextResponse.redirect(
+      adminLoginUrl
+    );
   }
 
   return response;
@@ -76,5 +147,6 @@ export async function middleware(request: NextRequest) {
 export const config = {
   matcher: [
     "/me/:path*",
+    "/admin/:path*",
   ],
 };

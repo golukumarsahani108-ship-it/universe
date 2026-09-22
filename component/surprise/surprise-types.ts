@@ -256,3 +256,284 @@ export const DEFAULT_SURPRISE_DATA: SurpriseData = {
     musicText: "a song for you",
   },
 };
+export type BirthdayBoxFragment = {
+  number: string;
+  icon: string;
+  title: string;
+  label: string;
+  description: string;
+  content: string;
+};
+
+export type BirthdayBoxArchive = {
+  id: string;
+  label: string;
+  title: string;
+  message: string;
+};
+
+export type BirthdayBoxData = {
+  intro: {
+    eyebrow: string;
+    miniLabel: string;
+    titleLineOne: string;
+    titleLineTwo: string;
+    description: string;
+    buttonText: string;
+    scrollNote: string;
+  };
+
+  access: {
+    kicker: string;
+    panelLabel: string;
+    titleLineOne: string;
+    titleLineTwo: string;
+    description: string;
+    errorText: string;
+    buttonText: string;
+    hint: string;
+  };
+
+  fragments: {
+    kicker: string;
+    titleLineOne: string;
+    titleLineTwo: string;
+    description: string;
+    headingDecoration: string;
+    headingDecorationSmall: string;
+    continueText: string;
+    items: BirthdayBoxFragment[];
+  };
+
+  mirror: {
+    kicker: string;
+    moveText: string;
+    titleLineOne: string;
+    titleLineTwo: string;
+    message: string;
+    hint: string;
+    continueText: string;
+  };
+
+  frequency: {
+    kicker: string;
+    panelLabel: string;
+    titleLineOne: string;
+    titleLineTwo: string;
+    continueText: string;
+  };
+
+  archive: {
+    kicker: string;
+    titleLineOne: string;
+    titleLineTwo: string;
+    description: string;
+    items: BirthdayBoxArchive[];
+    continueText: string;
+  };
+
+  message: {
+    kicker: string;
+    topLeft: string;
+    titleLineOne: string;
+    titleLineTwo: string;
+    message: string;
+    continueText: string;
+  };
+
+  core: {
+    kicker: string;
+    titleLineOne: string;
+    titleLineTwo: string;
+    buttonText: string;
+  };
+
+  final: {
+    eyebrow: string;
+    titleLineOne: string;
+    titleLineTwo: string;
+    message: string;
+    cardLabel: string;
+    cardText: string;
+    restartText: string;
+  };
+
+  password: string;
+  musicUrl: string;
+  musicPath: string;
+};
+
+export const DEFAULT_BIRTHDAY_BOX: BirthdayBoxData = {
+  intro: {
+    eyebrow: "A LITTLE BIRTHDAY SECRET",
+    miniLabel: "SOMETHING WAS LEFT HERE FOR YOU",
+    titleLineOne: "YOU FOUND",
+    titleLineTwo: "THE BOX.",
+    description:
+      "A tiny little mystery filled with memories, music, messages and one final birthday surprise.",
+    buttonText: "ENTER THE BOX",
+    scrollNote: "TAKE YOUR TIME",
+  },
+
+  access: {
+    kicker: "PRIVATE ACCESS",
+    panelLabel: "BIRTHDAY ACCESS REQUIRED",
+    titleLineOne: "Enter the",
+    titleLineTwo: "secret code.",
+    description:
+      "Four little numbers stand between you and what is waiting inside.",
+    errorText: "That's not the right little secret. Try again.",
+    buttonText: "UNLOCK",
+    hint: "ENTER THE 4 DIGIT CODE",
+  },
+
+  fragments: {
+    kicker: "LITTLE FRAGMENTS",
+    titleLineOne: "A few things",
+    titleLineTwo: "saved for today.",
+    description:
+      "Open them one by one. Some things are meant to be discovered slowly.",
+    headingDecoration: "✦",
+    headingDecorationSmall: "FOR YOU",
+    continueText: "KEEP GOING",
+
+    items: [
+      {
+        number: "01",
+        icon: "◌",
+        title: "MEMORY",
+        label: "A little moment",
+        description:
+          "Some moments are tiny, but somehow they stay.",
+        content:
+          "Keep the little moments close. The random laughs, the silly conversations, the unexpected good days — those are often the ones that become the best memories.",
+      },
+      {
+        number: "02",
+        icon: "?",
+        title: "QUESTION",
+        label: "A tiny thought",
+        description:
+          "A tiny question for your birthday.",
+        content:
+          "If you could keep one feeling from this year and carry it into the next one, what would you choose?",
+      },
+      {
+        number: "03",
+        icon: "✦",
+        title: "SECRET",
+        label: "Something hidden",
+        description:
+          "Something small was hidden here.",
+        content:
+          "Here is the secret: you made it this far. And that means there is still one more thing waiting for you.",
+      },
+      {
+        number: "04",
+        icon: "♫",
+        title: "SOUND",
+        label: "A little atmosphere",
+        description:
+          "A little atmosphere for the moment.",
+        content:
+          "Sometimes a song can turn an ordinary moment into a memory. There is a little sound waiting for you in the next room.",
+      },
+      {
+        number: "05",
+        icon: "♡",
+        title: "MESSAGE",
+        label: "Words saved for you",
+        description:
+          "Words that were waiting to be opened.",
+        content:
+          "Whatever this new year brings, I hope you find more reasons to smile, more things to look forward to and plenty of moments worth remembering.",
+      },
+    ],
+  },
+
+  mirror: {
+    kicker: "LOOK CLOSER",
+    moveText: "MOVE CLOSER",
+    titleLineOne: "THERE IS",
+    titleLineTwo: "MORE HERE.",
+    message:
+      "today is a little more special because it belongs to you.",
+    hint:
+      "Move your cursor around the glass • or touch it on mobile",
+    continueText: "NEXT FRAGMENT",
+  },
+
+  frequency: {
+    kicker: "BIRTHDAY FREQUENCY",
+    panelLabel: "A LITTLE SOUND FOR TODAY",
+    titleLineOne: "Press play.",
+    titleLineTwo: "Let it glow.",
+    continueText: "NEXT",
+  },
+
+  archive: {
+    kicker: "THE ARCHIVE",
+    titleLineOne: "Things worth",
+    titleLineTwo: "keeping.",
+    description:
+      "Little snapshots from a little universe.",
+
+    items: [
+      {
+        id: "01",
+        label: "ARCHIVE 01",
+        title: "A SMALL MOMENT",
+        message:
+          "A small moment can become a surprisingly important memory. Save the ordinary days too.",
+      },
+      {
+        id: "02",
+        label: "ARCHIVE 02",
+        title: "ONE OF THOSE DAYS",
+        message:
+          "Some days do not need to be perfect. They just need one good moment worth remembering.",
+      },
+      {
+        id: "03",
+        label: "ARCHIVE 03",
+        title: "KEEP THIS ONE",
+        message:
+          "This one is officially marked: KEEP. Some memories deserve their own little corner.",
+      },
+    ],
+
+    continueText: "THERE'S ONE MORE",
+  },
+
+  message: {
+    kicker: "UNSENT MESSAGE",
+    topLeft: "FOR YOU",
+    titleLineOne: "A little",
+    titleLineTwo: "birthday note.",
+    message:
+      "I hope today gives you plenty of reasons to smile, laugh and make another beautiful memory.",
+    continueText: "KEEP THIS",
+  },
+
+  core: {
+    kicker: "EVERYTHING LEADS HERE",
+    titleLineOne: "One last",
+    titleLineTwo: "surprise.",
+    buttonText: "OPEN THE BOX",
+  },
+
+  final: {
+    eyebrow: "THE BOX IS OPEN",
+    titleLineOne: "HAPPY",
+    titleLineTwo: "BIRTHDAY.",
+    message:
+      "May this new year of your life be filled with tiny happy moments, unexpected smiles, beautiful memories and everything good that you deserve.",
+    cardLabel: "THIS LITTLE UNIVERSE",
+    cardText: "WAS MADE JUST FOR TODAY.",
+    restartText: "↻ EXPERIENCE AGAIN",
+  },
+
+  password: "1234",
+  musicUrl: "",
+  musicPath: "",
+};

@@ -9,10 +9,10 @@ export default function SurprisePage() {
   const router = useRouter();
 
   return (
-   <PageShell
-  title="Surprise"
-  description="Create a little surprise experience ✨"
->
+    <PageShell
+      title="Surprise"
+      description="Create a little surprise experience ✨"
+    >
       <div className="surprise-home">
         <GlassCard className="surprise-home-card">
           <div className="surprise-home-icon">🎁</div>
@@ -33,7 +33,7 @@ export default function SurprisePage() {
 
           <GlassButton
             active
-            onClick={() => router.push("/surprise/customize")}
+            onClick={() => router.push("/surprise/birthday")}
           >
             Customize ✨
           </GlassButton>

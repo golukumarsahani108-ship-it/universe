@@ -270,61 +270,86 @@ function normalizeSurpriseData(
   };
 }
 
-export default function SurprisePreviewPage() {
+function DynamicTemplatePreview({ templateId }: { templateId: string }) {
   const router = useRouter();
-
-  const [data, setData] =
-    useState<SurpriseData | null>(null);
+  const [template, setTemplate] = useState<any>(null);
+  const [data, setData] = useState<Record<string, unknown>>({});
 
   useEffect(() => {
-    const saved =
-      localStorage.getItem(
-        "my-universe-surprise"
-      );
+    const stored = localStorage.getItem("my-universe-surprise");
+    if (stored) {
+      try {
+        const parsed = JSON.parse(stored);
+        setData(parsed?.templateData ?? {});
+      } catch {}
+    }
+    fetch(`/api/templates/${encodeURIComponent(templateId)}`)
+      .then((r) => r.json())
+      .then((result) => setTemplate(result.template))
+      .catch(() => setTemplate(null));
+  }, [templateId]);
 
-    if (!saved) {
-      router.replace(
-        "/surprise/customize"
-      );
+  useEffect(() => {
+    const frame = document.querySelector<HTMLIFrameElement>("[data-dynamic-preview]");
+    if (frame) frame.contentWindow?.postMessage({ type: "MLU_TEMPLATE_DATA", data }, "*");
+  }, [data, template]);
+
+  if (!template) {
+    return <PageShell title="Preview" description="Loading your uploaded website…"><div className="p-8 text-center text-white/50">Loading preview…</div></PageShell>;
+  }
+
+  return (
+    <PageShell title={template.name} description="Preview your uploaded website before publishing.">
+      <div className="space-y-5">
+        <div className="overflow-hidden rounded-3xl border border-white/10 bg-black/30 p-2">
+          <iframe
+            data-dynamic-preview
+            title={`${template.name} preview`}
+            src={`/api/templates/${template.id}/${template.entry_path || "index.html"}`}
+            onLoad={(event) => event.currentTarget.contentWindow?.postMessage({ type: "MLU_TEMPLATE_DATA", data }, "*")}
+            sandbox="allow-scripts allow-forms allow-modals"
+            className="h-[70vh] min-h-[520px] w-full rounded-2xl border-0 bg-black"
+          />
+        </div>
+        <div className="flex flex-wrap gap-3">
+          <GlassButton onClick={() => router.push(`/surprise/customize?template=${encodeURIComponent(template.id)}`)}>← Edit</GlassButton>
+          <GlassButton active onClick={() => router.push("/surprise/publish")}>Publish Surprise ✨</GlassButton>
+        </div>
+      </div>
+    </PageShell>
+  );
+}
+
+export default function SurprisePreviewPage() {
+  const router = useRouter();
+  const [dynamicTemplateId, setDynamicTemplateId] = useState<string | null>(null);
+  const [data, setData] = useState<SurpriseData | null>(null);
+
+  useEffect(() => {
+    const template = new URLSearchParams(window.location.search).get("template");
+    if (template && template !== "birthday-01" && template !== "birthday-02") {
+      setDynamicTemplateId(template);
       return;
     }
 
+    const saved = localStorage.getItem("my-universe-surprise");
+    if (!saved) {
+      router.replace("/surprise/customize");
+      return;
+    }
     try {
-      const parsed =
-        JSON.parse(saved);
-
-      const normalized =
-        normalizeSurpriseData(
-          parsed
-        );
-
+      const normalized = normalizeSurpriseData(JSON.parse(saved));
       setData(normalized);
-
-      /*
-       * Save normalized data back.
-       *
-       * This is important because the
-       * Little Collection memories are
-       * preserved here.
-       */
-      localStorage.setItem(
-        "my-universe-surprise",
-        JSON.stringify(normalized)
-      );
-    } catch {
-      const fallback =
-        normalizeSurpriseData(
-          DEFAULT_SURPRISE_DATA
-        );
-
-      setData(fallback);
-
-      localStorage.setItem(
-        "my-universe-surprise",
-        JSON.stringify(fallback)
-      );
+      localStorage.setItem("my-universe-surprise", JSON.stringify(normalized));
+    } catch (error) {
+      console.error("Invalid surprise data:", error);
+      router.replace("/surprise/customize");
     }
   }, [router]);
+
+  if (dynamicTemplateId) {
+    return <DynamicTemplatePreview templateId={dynamicTemplateId} />;
+  }
 
   if (!data) {
     return (

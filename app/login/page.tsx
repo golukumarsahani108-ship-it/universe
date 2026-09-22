@@ -1,446 +1,451 @@
 "use client";
 
-import {
-  Suspense,
-  useEffect,
-  useState,
-} from "react";
+import { FormEvent, useState } from "react";
 import Link from "next/link";
-import {
-  useRouter,
-  useSearchParams,
-} from "next/navigation";
+import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import "./login.css";
 
-type Mode = "welcome" | "login" | "signup";
-
-function LoginContent() {
+export default function LoginPage() {
   const router = useRouter();
-  const searchParams = useSearchParams();
   const supabase = createClient();
 
-  const [mode, setMode] =
-    useState<Mode>("welcome");
-  const [loading, setLoading] =
-    useState(false);
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
-  useEffect(() => {
-    let mounted = true;
+  async function handleLogin(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault();
 
-    async function checkSession() {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
+    setError("");
 
-      if (!mounted) return;
-
-      if (session?.user) {
-        const redirect =
-          searchParams.get("redirect") || "/me";
-
-        const safeRedirect =
-          redirect.startsWith("/") &&
-          !redirect.startsWith("//")
-            ? redirect
-            : "/me";
-
-        router.replace(safeRedirect);
-      }
+    if (!username.trim() || !password) {
+      setError("Please enter your email and password.");
+      return;
     }
-
-    checkSession();
-
-    return () => {
-      mounted = false;
-    };
-  }, [router, supabase, searchParams]);
-
-  async function continueWithGoogle() {
-    if (loading) return;
 
     setLoading(true);
 
-    const redirect =
-      searchParams.get("redirect") || "/";
-
-    const safeRedirect =
-      redirect.startsWith("/") &&
-      !redirect.startsWith("//")
-        ? redirect
-        : "/";
-
-    const callbackUrl = new URL(
-      "/api/auth/callback",
-      window.location.origin
-    );
-
-    callbackUrl.searchParams.set(
-      "next",
-      safeRedirect
-    );
-
-    const { error } =
-      await supabase.auth.signInWithOAuth({
-        provider: "google",
-        options: {
-          redirectTo: callbackUrl.toString(),
-
-          queryParams: {
-            prompt: "select_account",
-          },
-        },
+    const { error: loginError } =
+      await supabase.auth.signInWithPassword({
+        email: username.trim(),
+        password,
       });
 
-    if (error) {
-      console.error(error);
+    if (loginError) {
+      setError(loginError.message);
       setLoading(false);
+      return;
     }
+
+    router.push("/surprise");
+    router.refresh();
   }
-
-  const hasError =
-    searchParams.get("error");
-
-  /* ================================
-     WELCOME
-  ================================= */
-
-  if (mode === "welcome") {
-    return (
-      <main className="auth-page">
-
-        <Link
-          href="/"
-          className="auth-back-home"
-        >
-          ← Back to Home
-        </Link>
-
-        <div className="auth-welcome-card">
-
-          <div className="auth-welcome-orb">
-            ✨
-          </div>
-
-          <div className="auth-welcome-label">
-            START YOUR JOURNEY
-          </div>
-
-          <h1>
-            Hello,
-            <br />
-            Universe!
-          </h1>
-
-          <p>
-            Don't have an account?
-            <br />
-            Create your own little space.
-          </p>
-
-          <button
-            type="button"
-            className="auth-primary-button"
-            onClick={() =>
-              setMode("signup")
-            }
-          >
-            <span>
-              Create Account
-            </span>
-
-            <span className="auth-arrow">
-              →
-            </span>
-          </button>
-
-          <button
-            type="button"
-            className="auth-login-link"
-            onClick={() =>
-              setMode("login")
-            }
-          >
-            Already have an account?
-            <strong>
-              {" "}Sign In
-            </strong>
-          </button>
-
-        </div>
-
-      </main>
-    );
-  }
-
-  /* ================================
-     LOGIN / SIGNUP
-  ================================= */
 
   return (
-    <main className="auth-page">
+    <main className="login-page">
 
-      <Link
-        href="/"
-        className="auth-back-home"
-      >
-        ← Back to Home
-      </Link>
+      {/* =========================================
+          BACKGROUND
+      ========================================= */}
 
-      <div
-        className={`auth-container ${
-          mode === "login"
-            ? "login-active"
-            : "signup-active"
-        }`}
-      >
+      <div className="login-bg">
 
-        {/* LOGIN */}
+        <div className="red-glow glow-1" />
+        <div className="red-glow glow-2" />
+        <div className="red-glow glow-3" />
 
-        <section className="auth-form-panel auth-login-form">
+        <div className="circuit circuit-left-top">
+          <span />
+          <span />
+          <span />
+        </div>
 
-          <div className="auth-form-content">
+        <div className="circuit circuit-left-bottom">
+          <span />
+          <span />
+          <span />
+        </div>
 
-            <div className="auth-small-title">
-              MY LITTLE UNIVERSE
-            </div>
+        <div className="circuit circuit-right-top">
+          <span />
+          <span />
+          <span />
+        </div>
 
-            <div className="auth-form-orb">
-              🌌
-            </div>
+        <div className="circuit circuit-right-bottom">
+          <span />
+          <span />
+          <span />
+        </div>
 
-            <h1>
-              Welcome Back
-            </h1>
+        <div className="vertical-line line-left" />
+        <div className="vertical-line line-right" />
 
-            <p className="auth-subtitle">
-              Come back to your little universe.
-            </p>
-
-            <button
-              type="button"
-              className="google-button"
-              onClick={continueWithGoogle}
-              disabled={loading}
-            >
-              <span className="google-icon" aria-hidden="true">
-  <svg
-    width="20"
-    height="20"
-    viewBox="0 0 24 24"
-    xmlns="http://www.w3.org/2000/svg"
-  >
-    <path
-      fill="#4285F4"
-      d="M21.35 12.27c0-.79-.07-1.55-.23-2.27H12v4.3h5.24a4.48 4.48 0 0 1-1.94 2.94v2.45h3.14c1.84-1.69 2.91-4.18 2.91-7.42Z"
-    />
-    <path
-      fill="#34A853"
-      d="M12 21.75c2.63 0 4.84-.87 6.45-2.36l-3.14-2.45c-.87.58-1.98.92-3.31.92-2.54 0-4.69-1.72-5.46-4.03H3.3v2.53A9.75 9.75 0 0 0 12 21.75Z"
-    />
-    <path
-      fill="#FBBC05"
-      d="M6.54 13.83A5.86 5.86 0 0 1 6.23 12c0-.64.11-1.26.31-1.83V7.64H3.3A9.75 9.75 0 0 0 2.25 12c0 1.57.38 3.06 1.05 4.36l3.24-2.53Z"
-    />
-    <path
-      fill="#EA4335"
-      d="M12 6.14c1.43 0 2.71.49 3.72 1.45l2.79-2.79C16.84 3.2 14.63 2.25 12 2.25a9.75 9.75 0 0 0-8.7 5.39l3.24 2.53C7.31 7.86 9.46 6.14 12 6.14Z"
-    />
-  </svg>
-</span>
-
-              <span>
-                {loading
-                  ? "Connecting..."
-                  : "Continue with Google"}
-              </span>
-            </button>
-
-            {hasError && (
-              <div className="auth-message">
-                Google sign in could not be completed.
-                Please try again.
-              </div>
-            )}
-
-            <div className="auth-trust">
-              🔒 Secure sign in with Google
-            </div>
-
-          </div>
-
-        </section>
-
-        {/* SIGNUP */}
-
-        <section className="auth-form-panel auth-signup-form">
-
-          <div className="auth-form-content">
-
-            <div className="auth-small-title">
-              START YOUR JOURNEY
-            </div>
-
-            <div className="auth-form-orb signup-orb">
-              ✨
-            </div>
-
-            <h1>
-              Create Account
-            </h1>
-
-            <p className="auth-subtitle">
-              Create your own little universe.
-            </p>
-
-            <button
-              type="button"
-              className="google-button"
-              onClick={continueWithGoogle}
-              disabled={loading}
-            >
-              <span className="google-icon">
-                G
-              </span>
-
-              <span>
-                {loading
-                  ? "Connecting..."
-                  : "Continue with Google"}
-              </span>
-            </button>
-
-            {hasError && (
-              <div className="auth-message">
-                Google sign in could not be completed.
-                Please try again.
-              </div>
-            )}
-
-            <div className="auth-benefits">
-
-              <div className="auth-benefit">
-                <span>✦</span>
-                <span>
-                  Your own personal universe
-                </span>
-              </div>
-
-              <div className="auth-benefit">
-                <span>✦</span>
-                <span>
-                  Keep your memories & dreams
-                </span>
-              </div>
-
-              <div className="auth-benefit">
-                <span>✦</span>
-                <span>
-                  Build your journey your way
-                </span>
-              </div>
-
-            </div>
-
-          </div>
-
-        </section>
-
-        {/* SLIDER */}
-
-        <div className="auth-slider">
-
-          {mode === "signup" ? (
-
-            <div className="auth-slider-content">
-
-              <div className="auth-slider-orb">
-                🌌
-              </div>
-
-              <div className="auth-slider-label">
-                WELCOME BACK
-              </div>
-
-              <h2>
-                Welcome
-                <br />
-                Back!
-              </h2>
-
-              <p>
-                Already have an account?
-                <br />
-                Continue your journey.
-              </p>
-
-              <button
-                type="button"
-                className="auth-outline-button"
-                onClick={() =>
-                  setMode("login")
-                }
-              >
-                <span>←</span>
-                Sign In
-              </button>
-
-            </div>
-
-          ) : (
-
-            <div className="auth-slider-content">
-
-              <div className="auth-slider-orb">
-                ✨
-              </div>
-
-              <div className="auth-slider-label">
-                START YOUR JOURNEY
-              </div>
-
-              <h2>
-                Hello,
-                <br />
-                Universe!
-              </h2>
-
-              <p>
-                Don't have an account?
-                <br />
-                Create your own little space.
-              </p>
-
-              <button
-                type="button"
-                className="auth-outline-button"
-                onClick={() =>
-                  setMode("signup")
-                }
-              >
-                Create Account
-                <span>→</span>
-              </button>
-
-            </div>
-
-          )}
-
+        <div className="background-particles">
+          <i />
+          <i />
+          <i />
+          <i />
+          <i />
+          <i />
+          <i />
+          <i />
         </div>
 
       </div>
 
+
+      {/* =========================================
+          MAIN WINDOW
+      ========================================= */}
+
+      <section className="login-window">
+
+        {/* TOP BAR */}
+
+        <div className="window-bar">
+
+          <div className="window-dots">
+            <span className="window-dot red" />
+            <span className="window-dot yellow" />
+            <span className="window-dot green" />
+          </div>
+
+          <div className="window-name">
+            MY LITTLE UNIVERSE
+          </div>
+
+          <div className="window-status">
+            <span />
+            SECURE CONNECTION
+          </div>
+
+        </div>
+
+
+        {/* =========================================
+            LOGIN CONTENT
+        ========================================= */}
+
+        <div className="login-content">
+
+          <div className="login-card">
+
+
+            {/* LEFT LOGIN SIDE */}
+
+            <div className="login-form-side">
+
+              <div className="form-inner">
+
+                <div className="form-top-label">
+                  ACCOUNT ACCESS
+                </div>
+
+                <h1>
+                  Login
+                </h1>
+
+                <div className="form-line" />
+
+
+                <form onSubmit={handleLogin}>
+
+                  {/* USERNAME */}
+
+                  <div className="input-group">
+
+                    <label htmlFor="username">
+                      USERNAME
+                    </label>
+
+                    <div className="login-input">
+
+                      <span className="input-icon">
+                        ♙
+                      </span>
+
+                      <input
+                        id="username"
+                        type="email"
+                        placeholder="Username"
+                        value={username}
+                        onChange={(e) =>
+                          setUsername(e.target.value)
+                        }
+                        autoComplete="email"
+                      />
+
+                    </div>
+
+                  </div>
+
+
+                  {/* PASSWORD */}
+
+                  <div className="input-group">
+
+                    <label htmlFor="password">
+                      PASSWORD
+                    </label>
+
+                    <div className="login-input">
+
+                      <span className="input-icon">
+                        ♙
+                      </span>
+
+                      <input
+                        id="password"
+                        type="password"
+                        placeholder="Password"
+                        value={password}
+                        onChange={(e) =>
+                          setPassword(e.target.value)
+                        }
+                        autoComplete="current-password"
+                      />
+
+                    </div>
+
+                  </div>
+
+
+                  {/* ERROR */}
+
+                  {error && (
+                    <div className="login-error">
+                      {error}
+                    </div>
+                  )}
+
+
+                  {/* BUTTON */}
+
+                  <button
+                    type="submit"
+                    className="login-submit"
+                    disabled={loading}
+                  >
+                    {loading ? "Logging in..." : "Login"}
+                  </button>
+
+                </form>
+
+
+                {/* SIGNUP */}
+
+                <div className="form-links">
+
+                  <span>
+                    Don't own an account?
+                  </span>
+
+                  <Link href="/signup">
+                    Sign up
+                  </Link>
+
+                </div>
+
+                <Link
+                  href="/forgot-password"
+                  className="forgot-link"
+                >
+                  Forgot Password?
+                </Link>
+
+              </div>
+
+            </div>
+
+
+            {/* =====================================
+                RIGHT WELCOME SIDE
+            ===================================== */}
+
+            <div className="welcome-side">
+
+              <div className="welcome-shape" />
+
+              <div className="welcome-content">
+
+                <div className="welcome-small">
+                  MY LITTLE UNIVERSE
+                </div>
+
+                <h2>
+                  WELCOME
+                  <br />
+                  BACK!
+                </h2>
+
+                <div className="welcome-divider" />
+
+                <p>
+                  To keep connected with us please
+                  <br />
+                  login with your personal info.
+                </p>
+
+                <div className="welcome-orbit">
+                  <span className="orbit-dot" />
+                </div>
+
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+
+        {/* =========================================
+            CODE FOOTER
+        ========================================= */}
+
+        <div className="code-footer">
+
+          <div className="code-header">
+
+            <div className="code-file">
+              <span className="html-symbol">
+                &lt;/&gt;
+              </span>
+
+              login.tsx
+            </div>
+
+            <div className="code-actions">
+              <span>LOGIN PAGE</span>
+              <b>VS</b>
+              <span>FOLLOW FOR MORE</span>
+            </div>
+
+          </div>
+
+
+          <div className="code-body">
+
+            <div className="code-line">
+              <span className="number">01</span>
+              <span className="purple">import</span>{" "}
+              <span className="white">
+                {"{"}
+              </span>{" "}
+              <span className="yellow">
+                useState
+              </span>{" "}
+              <span className="white">
+                {"}"}
+              </span>{" "}
+              <span className="purple">
+                from
+              </span>{" "}
+              <span className="green">
+                &quot;react&quot;
+              </span>
+            </div>
+
+            <div className="code-line">
+              <span className="number">02</span>
+              <span className="purple">import</span>{" "}
+              <span className="white">
+                {"{"}
+              </span>{" "}
+              <span className="yellow">
+                Link
+              </span>{" "}
+              <span className="white">
+                {"}"}
+              </span>{" "}
+              <span className="purple">
+                from
+              </span>{" "}
+              <span className="green">
+                &quot;next/link&quot;
+              </span>
+            </div>
+
+            <div className="code-line empty">
+              <span className="number">03</span>
+            </div>
+
+            <div className="code-line">
+              <span className="number">04</span>
+              <span className="purple">
+                const
+              </span>{" "}
+              <span className="blue">
+                Login
+              </span>{" "}
+              <span className="white">
+                =
+              </span>{" "}
+              <span className="pink">
+                ()
+              </span>{" "}
+              <span className="purple">
+                =&gt;
+              </span>{" "}
+              <span className="white">
+                {"{"}
+              </span>
+            </div>
+
+            <div className="code-line indent">
+              <span className="number">05</span>
+              <span className="purple">
+                return
+              </span>{" "}
+              <span className="white">
+                (
+              </span>
+            </div>
+
+            <div className="code-line indent-2">
+              <span className="number">06</span>
+              <span className="red-code">
+                &lt;UniverseLogin /&gt;
+              </span>
+            </div>
+
+            <div className="code-line indent">
+              <span className="number">07</span>
+              <span className="white">
+                )
+              </span>
+            </div>
+
+            <div className="code-line">
+              <span className="number">08</span>
+              <span className="white">
+                {"}"}
+              </span>
+            </div>
+
+          </div>
+
+        </div>
+
+      </section>
+
+
+      {/* =========================================
+          PAGE BRAND
+      ========================================= */}
+
+      <div className="page-brand">
+        <span className="brand-dot" />
+        MY LITTLE UNIVERSE
+      </div>
+
+      <div className="page-version">
+        v1.0
+      </div>
+
     </main>
-  );
-}
-
-/* =================================
-   PAGE
-================================= */
-
-export default function LoginPage() {
-  return (
-    <Suspense fallback={null}>
-      <LoginContent />
-    </Suspense>
   );
 }

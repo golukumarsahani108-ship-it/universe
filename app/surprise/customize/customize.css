@@ -1,0 +1,62 @@
+
+.birthday-box-customizer-placeholder {
+  width: 100%;
+  min-height: 60vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 30px 20px;
+}
+
+.birthday-box-customizer-card {
+  position: relative;
+  width: min(620px, 100%);
+  padding: 55px 35px;
+  text-align: center;
+
+  border-radius: 30px;
+  border: 1px solid rgba(255, 150, 205, 0.2);
+
+  background:
+    radial-gradient(
+      circle at 50% 20%,
+      rgba(255, 120, 190, 0.15),
+      transparent 45%
+    ),
+    rgba(255, 255, 255, 0.045);
+
+  box-shadow:
+    0 30px 90px rgba(0, 0, 0, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+
+  backdrop-filter: blur(25px);
+}
+
+.birthday-box-customizer-card > span {
+  color: #d94f8a;
+  font-size: 9px;
+  letter-spacing: 0.25em;
+}
+
+.birthday-box-customizer-card h1 {
+  margin: 16px 0 4px;
+  color: #ffffff;
+  font-size: clamp(42px, 7vw, 72px);
+  letter-spacing: -0.05em;
+}
+
+.birthday-box-customizer-card p {
+  margin: 0;
+  color: #ffafd0;
+  font-size: 14px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.birthday-box-customizer-card small {
+  display: block;
+  margin-top: 24px;
+  color: rgba(255, 255, 255, 0.48);
+  font-size: 12px;
+}
+

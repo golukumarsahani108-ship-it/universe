@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import "./admin/websites/templates/templates.css";
 
 import { FeatureProvider } from "@/component/settings/feature-store";
 import { AIProvider } from "@/component/ai/AIProvider";
