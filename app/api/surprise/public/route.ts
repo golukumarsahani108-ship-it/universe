@@ -22,7 +22,8 @@ export async function GET(request: Request) {
         opening_message,
         music,
         password_enabled,
-        password_screen
+        password_screen,
+        design
       `)
       .eq("slug", slug)
       .eq("published", true)

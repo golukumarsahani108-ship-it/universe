@@ -19,7 +19,37 @@ export default async function UniversePage({
   if (error || !universe) notFound();
 
   const design = (universe.design ?? {}) as Record<string, unknown>;
-  const templateId = typeof design.template_id === "string" ? design.template_id : null;
+  const templateId =
+    typeof design.template_id === "string"
+      ? design.template_id
+      : null;
+
+  if (templateId === "birthday-02") {
+    return (
+      <main
+        style={{
+          position: "fixed",
+          inset: 0,
+          width: "100vw",
+          height: "100dvh",
+          overflow: "hidden",
+          background: "#080811",
+        }}
+      >
+        <iframe
+          title={universe.title || "THE BOX — Birthday Edition"}
+          src={`/surprise-template-2/index.html?slug=${encodeURIComponent(slug)}`}
+          style={{
+            display: "block",
+            width: "100%",
+            height: "100%",
+            border: 0,
+          }}
+          allow="autoplay; fullscreen"
+        />
+      </main>
+    );
+  }
 
   if (templateId) {
     return (

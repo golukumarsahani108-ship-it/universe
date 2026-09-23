@@ -20,6 +20,251 @@ document.addEventListener("DOMContentLoaded", () => {
   const coreScreen = document.getElementById("coreScreen");
   const finalScreen = document.getElementById("finalScreen");
 
+  /* =======================================================
+     DYNAMIC BIRTHDAY BOX DATA
+  ======================================================= */
+
+  let boxData = null;
+  let SECRET_CODE = "2008";
+
+  function escapeHtml(value) {
+    return String(value ?? "")
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
+  }
+
+  function setText(selector, value) {
+    const element = document.querySelector(selector);
+    if (element && value !== undefined && value !== null) {
+      element.textContent = String(value);
+    }
+  }
+
+  function setSplitHeading(selector, first, second) {
+    const element = document.querySelector(selector);
+    if (!element) return;
+
+    element.innerHTML =
+      `${escapeHtml(first)}<span>${escapeHtml(second)}</span>`;
+  }
+
+  function applyBoxData(data) {
+    if (!data || typeof data !== "object") return;
+
+    boxData = data;
+
+    /* INTRO */
+    setText(".intro-content .eyebrow", data.intro?.eyebrow);
+    setText(".mini-label", data.intro?.miniLabel);
+    setSplitHeading(
+      ".intro-copy h1",
+      data.intro?.titleLineOne || "YOU FOUND",
+      data.intro?.titleLineTwo || "THE BOX."
+    );
+    setText(".intro-description", data.intro?.description);
+    setText("#enterButton span", data.intro?.buttonText);
+    setText(".scroll-note", data.intro?.scrollNote);
+
+    /* ACCESS */
+    setText(
+      "#accessScreen .section-kicker",
+      data.access?.kicker || "PRIVATE ACCESS"
+    );
+    setText(".panel-label", data.access?.panelLabel);
+    setSplitHeading(
+      ".access-panel h2",
+      data.access?.titleLineOne || "Enter the",
+      data.access?.titleLineTwo || "secret code."
+    );
+    setText(".panel-description", data.access?.description);
+    setText("#codeError", data.access?.errorText);
+    setText("#unlockButton", data.access?.buttonText || "UNLOCK");
+    setText(".code-hint", data.access?.hint);
+
+    if (typeof data.access?.code === "string" && /^\d{4}$/.test(data.access.code)) {
+      SECRET_CODE = data.access.code;
+    } else if (typeof data.password === "string" && /^\d{4}$/.test(data.password)) {
+      SECRET_CODE = data.password;
+    }
+
+    /* FRAGMENTS */
+    setText("#fragmentsScreen .section-heading .section-kicker", data.fragments?.kicker);
+    setSplitHeading(
+      "#fragmentsScreen .section-heading h2",
+      data.fragments?.titleLineOne || "A few things",
+      data.fragments?.titleLineTwo || "saved for today."
+    );
+    setText("#fragmentsScreen .section-heading p", data.fragments?.description);
+    setText("#fragmentsScreen .heading-decoration span", data.fragments?.headingDecoration);
+    setText("#fragmentsScreen .heading-decoration small", data.fragments?.headingDecorationSmall);
+    setText("#fragmentContinue", data.fragments?.continueText);
+
+    if (Array.isArray(data.fragments?.items)) {
+      document.querySelectorAll(".fragment").forEach((button, index) => {
+        const item = data.fragments.items[index];
+        if (!item) return;
+
+        const number = button.querySelector(".fragment-number");
+        if (number) number.textContent = item.number || "";
+        const icon = button.querySelector(".fragment-icon");
+        const title = button.querySelector(".fragment-text strong");
+        const label = button.querySelector(".fragment-text span");
+
+        if (icon) icon.textContent = item.icon || "";
+        if (title) title.textContent = item.title || "";
+        if (label) {
+          label.textContent =
+            item.label || item.shortText || item.description || "";
+        }
+      });
+
+      /* Replace the modal source used by the click handler below. */
+      data.fragments.items.forEach((item, index) => {
+        const key = ["memory", "question", "secret", "sound", "message"][index];
+        if (!key) return;
+        if (fragmentData[key]) {
+          fragmentData[key] = {
+            number: item.number || fragmentData[key].number,
+            icon: item.icon || fragmentData[key].icon,
+            title: item.title || fragmentData[key].title,
+            description:
+              item.description ||
+              item.shortText ||
+              fragmentData[key].description,
+            content: item.content || fragmentData[key].content
+          };
+        }
+      });
+    }
+
+    /* MIRROR */
+    setText(".mirror-center > p", data.mirror?.moveText);
+    setSplitHeading(
+      ".mirror-center h2",
+      data.mirror?.titleLineOne || "THERE IS",
+      data.mirror?.titleLineTwo || "MORE HERE."
+    );
+    setText("#mirrorMessage", data.mirror?.message);
+    setText(".mirror-hint", data.mirror?.hint);
+    setText("#mirrorContinue", data.mirror?.continueText);
+
+    /* FREQUENCY */
+    setText("#frequencyScreen .panel-label", data.frequency?.panelLabel);
+    setSplitHeading(
+      "#frequencyScreen .frequency-top h2",
+      data.frequency?.titleLineOne || "Press play.",
+      data.frequency?.titleLineTwo || "Let it glow."
+    );
+    setText("#frequencyContinue", data.frequency?.continueText);
+
+    const audio = document.getElementById("frequencyAudio");
+    const musicUrl = data.frequency?.musicUrl || data.musicUrl || "";
+    if (audio && musicUrl) {
+      audio.src = musicUrl;
+      audio.load();
+    }
+
+    /* ARCHIVE */
+    setSplitHeading(
+      "#archiveScreen .section-heading h2",
+      data.archive?.titleLineOne || "Things worth",
+      data.archive?.titleLineTwo || "keeping."
+    );
+    setText("#archiveScreen .section-heading p", data.archive?.description);
+    setText("#archiveContinue", data.archive?.continueText);
+
+    if (Array.isArray(data.archive?.items)) {
+      document.querySelectorAll(".archive-card").forEach((card, index) => {
+        const item = data.archive.items[index];
+        if (!item) return;
+
+        const meta = card.querySelector(".archive-meta");
+        if (!meta) return;
+
+        const spans = meta.querySelectorAll("span, strong");
+        if (spans[0]) spans[0].textContent = item.label || `ARCHIVE 0${index + 1}`;
+        if (spans[1]) spans[1].textContent = item.title || "";
+      });
+    }
+
+    /* MESSAGE */
+    setText(".letter-top span:first-child", data.message?.topLeft);
+    setSplitHeading(
+      ".letter-paper h3",
+      data.message?.titleLineOne || "A little",
+      data.message?.titleLineTwo || "birthday note."
+    );
+    setText(".letter-paper > p", data.message?.message);
+    setText("#messageContinue", data.message?.continueText);
+
+    /* CORE */
+    setText(".core-copy > p", data.core?.kicker);
+    setSplitHeading(
+      ".core-copy h2",
+      data.core?.titleLineOne || "One last",
+      data.core?.titleLineTwo || "surprise."
+    );
+    setText("#revealButton", data.core?.buttonText || "OPEN THE BOX");
+
+    /* FINAL */
+    setText(".final-eyebrow", data.final?.eyebrow);
+    setSplitHeading(
+      ".final-content h1",
+      data.final?.titleLineOne || "HAPPY",
+      data.final?.titleLineTwo || "BIRTHDAY."
+    );
+    setText(".final-message", data.final?.message);
+    const finalCard = document.querySelector(".final-card");
+    if (finalCard) {
+      const cardParagraph = finalCard.querySelector("p");
+      const cardStrong = finalCard.querySelector("strong");
+      if (cardParagraph) cardParagraph.textContent = data.final?.cardLabel || "";
+      if (cardStrong) cardStrong.textContent = data.final?.cardText || "";
+    }
+    setText("#restartButton", data.final?.restartText || "↻ EXPERIENCE AGAIN");
+  }
+
+  async function loadPublishedBox() {
+    const slug =
+      new URLSearchParams(window.location.search).get("slug");
+
+    if (!slug) return;
+
+    try {
+      const response = await fetch(
+        `/api/surprise/public?slug=${encodeURIComponent(slug)}`,
+        { cache: "no-store" }
+      );
+
+      if (!response.ok) return;
+
+      const result = await response.json();
+      const design = result?.universe?.design;
+
+      if (
+        design?.template_id === "birthday-02" &&
+        design?.custom_data
+      ) {
+        applyBoxData(design.custom_data);
+      }
+    } catch (error) {
+      console.error("Could not load Birthday Box data:", error);
+    }
+  }
+
+  window.addEventListener("message", (event) => {
+    if (event.origin !== window.location.origin) return;
+
+    if (event.data?.type === "MLU_BIRTHDAY_BOX_DATA") {
+      applyBoxData(event.data.data);
+    }
+  });
+
+  loadPublishedBox();
+
 
   /* =======================================================
      STAR FIELD
@@ -129,7 +374,8 @@ document.addEventListener("DOMContentLoaded", () => {
      SECRET CODE
   ======================================================= */
 
-  const SECRET_CODE = "2008";
+  /* Default code; customized data can override this above. */
+  SECRET_CODE = SECRET_CODE || "2008";
 
   const codeInputs =
     document.querySelectorAll(".code-inputs input");

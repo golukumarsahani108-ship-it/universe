@@ -352,9 +352,25 @@ export default function BirthdayBoxCustomizer({
   onContinue,
 }: Props) {
   const [data, setData] =
-    useState<BirthdayBoxData>(
-      initialData || DEFAULT_BIRTHDAY_BOX_DATA
-    );
+    useState<BirthdayBoxData>(() => {
+      if (initialData) return initialData;
+
+      if (typeof window !== "undefined") {
+        try {
+          const stored = localStorage.getItem("birthday-box-data");
+          if (stored) {
+            const parsed = JSON.parse(stored) as BirthdayBoxData;
+            if (parsed?.template === "birthday-02") {
+              return parsed;
+            }
+          }
+        } catch {
+          // Fall back to defaults when saved data is invalid.
+        }
+      }
+
+      return DEFAULT_BIRTHDAY_BOX_DATA;
+    });
 
   const [uploading, setUploading] =
     useState(false);

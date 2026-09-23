@@ -68,6 +68,85 @@ export async function POST(request: Request) {
       requestedTemplate === "birthday-02";
 
     // =========================================================
+    // BUILT-IN BIRTHDAY BOX
+    // =========================================================
+    // The Box is a completely separate experience. Keep its
+    // configuration in design.custom_data so the public route
+    // can load the correct template instead of falling back to
+    // the original birthday experience.
+    if (requestedTemplate === "birthday-02") {
+      const boxData =
+        surprise &&
+        typeof surprise === "object"
+          ? surprise
+          : {};
+
+      const title =
+        String(
+          boxData.final?.title ||
+            boxData.intro?.title ||
+            "THE BOX — Birthday Edition"
+        ).trim() || "THE BOX — Birthday Edition";
+
+      const slug = makeSlug(title);
+
+      const { data: universe, error: universeError } =
+        await supabase
+          .from("universes")
+          .insert({
+            owner_id: user.id,
+            slug,
+            title,
+            person_name: null,
+            relationship: null,
+            opening_message:
+              boxData.intro?.description ||
+              "A little birthday mystery is waiting for you.",
+            description: null,
+            theme: "spatial-glass",
+            design: {
+              version: 2,
+              fixed: true,
+              type: "birthday-box",
+              template_id: "birthday-02",
+              custom_data: boxData,
+            },
+            music: {
+              birthdayBoxMusic:
+                boxData.frequency?.musicUrl || null,
+              birthdayBoxMusicPath:
+                boxData.frequency?.musicPath || null,
+            },
+            password_enabled: true,
+            password_hash: null,
+            password_screen: {
+              hint: boxData.access?.hint || "",
+            },
+            published: true,
+          })
+          .select("id,slug")
+          .single();
+
+      if (universeError || !universe) {
+        return NextResponse.json(
+          {
+            error:
+              universeError?.message ||
+              "Could not publish THE BOX.",
+          },
+          { status: 500 }
+        );
+      }
+
+      return NextResponse.json({
+        success: true,
+        slug: universe.slug,
+        url: `/u/${universe.slug}`,
+        templateId: "birthday-02",
+      });
+    }
+
+    // =========================================================
     // ADMIN-UPLOADED TEMPLATE
     // =========================================================
     // Uploaded templates use the same universes table as the original

@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 
 import PageShell from "@/component/layout/PageShell";
 import GlassButton from "@/component/glass/GlassButton";
+import type { BirthdayBoxData } from "@/component/surprise/BirthdayBoxCustomizer";
 
 import {
   DEFAULT_SURPRISE_DATA,
@@ -270,6 +271,87 @@ function normalizeSurpriseData(
   };
 }
 
+
+function BirthdayBoxPreview() {
+  const router = useRouter();
+  const [data, setData] = useState<BirthdayBoxData | null>(null);
+
+  useEffect(() => {
+    const stored = localStorage.getItem("birthday-box-data");
+
+    if (!stored) {
+      router.replace("/surprise/customize?template=birthday-02");
+      return;
+    }
+
+    try {
+      const parsed = JSON.parse(stored) as BirthdayBoxData;
+      if (parsed?.template !== "birthday-02") {
+        throw new Error("Invalid Birthday Box data.");
+      }
+      setData(parsed);
+    } catch (error) {
+      console.error("Invalid Birthday Box data:", error);
+      localStorage.removeItem("birthday-box-data");
+      router.replace("/surprise/customize?template=birthday-02");
+    }
+  }, [router]);
+
+  const sendData = (frame: HTMLIFrameElement) => {
+    if (!data) return;
+    frame.contentWindow?.postMessage(
+      { type: "MLU_BIRTHDAY_BOX_DATA", data },
+      window.location.origin
+    );
+  };
+
+  if (!data) {
+    return (
+      <PageShell title="THE BOX — Birthday Edition" description="Loading your preview...">
+        <div className="surprise-preview-loading">Loading...</div>
+      </PageShell>
+    );
+  }
+
+  return (
+    <PageShell
+      title="THE BOX — Birthday Edition"
+      description="Preview your customized Birthday Box before publishing."
+      backHref="/surprise/customize?template=birthday-02"
+      backLabel="Back to Customize"
+    >
+      <div className="space-y-5">
+        <div className="overflow-hidden rounded-3xl border border-white/10 bg-black/30 p-2">
+          <iframe
+            title="THE BOX — Birthday Edition preview"
+            src="/surprise-template-2/index.html?preview=1"
+            onLoad={(event) => sendData(event.currentTarget)}
+            sandbox="allow-scripts allow-forms allow-modals"
+            className="h-[70vh] min-h-[520px] w-full rounded-2xl border-0 bg-black"
+          />
+        </div>
+
+        <div className="flex flex-wrap gap-3">
+          <GlassButton
+            onClick={() =>
+              router.push("/surprise/customize?template=birthday-02")
+            }
+          >
+            ← Edit
+          </GlassButton>
+
+          <GlassButton
+            active
+            onClick={() => router.push("/surprise/publish?template=birthday-02")}
+          >
+            Publish Surprise ✨
+          </GlassButton>
+        </div>
+      </div>
+    </PageShell>
+  );
+}
+
 function DynamicTemplatePreview({ templateId }: { templateId: string }) {
   const router = useRouter();
   const [template, setTemplate] = useState<any>(null);
@@ -327,7 +409,11 @@ export default function SurprisePreviewPage() {
 
   useEffect(() => {
     const template = new URLSearchParams(window.location.search).get("template");
-    if (template && template !== "birthday-01" && template !== "birthday-02") {
+    if (template === "birthday-02") {
+      return;
+    }
+
+    if (template && template !== "birthday-01") {
       setDynamicTemplateId(template);
       return;
     }
@@ -346,6 +432,15 @@ export default function SurprisePreviewPage() {
       router.replace("/surprise/customize");
     }
   }, [router]);
+
+  const currentTemplate =
+    typeof window !== "undefined"
+      ? new URLSearchParams(window.location.search).get("template")
+      : null;
+
+  if (currentTemplate === "birthday-02") {
+    return <BirthdayBoxPreview />;
+  }
 
   if (dynamicTemplateId) {
     return <DynamicTemplatePreview templateId={dynamicTemplateId} />;
