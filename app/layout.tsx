@@ -3,8 +3,6 @@ import "./globals.css";
 import "./admin/websites/templates/templates.css";
 
 import { FeatureProvider } from "@/component/settings/feature-store";
-import { AIProvider } from "@/component/ai/AIProvider";
-import { AICompanion } from "@/component/ai/AICompanion";
 
 export const metadata: Metadata = {
   title: "My Little Universe",
@@ -47,10 +45,7 @@ export default function RootLayout({
     <html lang="en">
       <body>
         <FeatureProvider>
-          <AIProvider>
-            {children}
-            <AICompanion />
-          </AIProvider>
+          {children}
         </FeatureProvider>
       </body>
     </html>

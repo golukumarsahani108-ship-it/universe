@@ -110,6 +110,14 @@ export async function GET(
         buffer = Buffer.from(injectData(html, customData), "utf8");
       }
     }
+
+    const hideUrl = new URL(request.url);
+    if (hideUrl.searchParams.get("hideButtons") === "1") {
+      const hideStyle = `<style id="mlu-hide-surprise-buttons">button, [role="button"], input[type="button"], input[type="submit"], input[type="reset"], .button, .btn, a.button, a.btn, [class*="button"], [class*="-btn"], [class$="btn"] { display: none !important; visibility: hidden !important; }</style>`;
+      let html = buffer.toString("utf8");
+      html = /<\/head>/i.test(html) ? html.replace(/<\/head>/i, `${hideStyle}</head>`) : `${hideStyle}${html}`;
+      buffer = Buffer.from(html, "utf8");
+    }
   }
 
   return new NextResponse(new Uint8Array(buffer), {

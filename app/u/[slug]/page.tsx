@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { supabaseAdmin } from "@/lib/supabase/admin";
 
 export default async function UniversePage({
   params,
@@ -17,6 +18,13 @@ export default async function UniversePage({
     .maybeSingle();
 
   if (error || !universe) notFound();
+
+  const { data: platformSettings } = await supabaseAdmin
+    .from("platform_settings")
+    .select("hide_surprise_buttons")
+    .eq("id", true)
+    .maybeSingle();
+  const hideButtons = Boolean(platformSettings?.hide_surprise_buttons);
 
   const design = (universe.design ?? {}) as Record<string, unknown>;
   const templateId =
@@ -38,7 +46,7 @@ export default async function UniversePage({
       >
         <iframe
           title={universe.title || "THE BOX — Birthday Edition"}
-          src={`/surprise-template-2/index.html?slug=${encodeURIComponent(slug)}`}
+          src={`/surprise-template-2/index.html?slug=${encodeURIComponent(slug)}${hideButtons ? "&hideButtons=1" : ""}`}
           style={{
             display: "block",
             width: "100%",
@@ -56,7 +64,7 @@ export default async function UniversePage({
       <main style={{ position: "fixed", inset: 0, width: "100vw", height: "100dvh", overflow: "hidden", background: "#080811" }}>
         <iframe
           title={universe.title || "A Little Surprise"}
-          src={`/api/templates/${encodeURIComponent(templateId)}/index.html?slug=${encodeURIComponent(slug)}`}
+          src={`/api/templates/${encodeURIComponent(templateId)}/index.html?slug=${encodeURIComponent(slug)}${hideButtons ? "&hideButtons=1" : ""}`}
           style={{ display: "block", width: "100%", height: "100%", border: 0 }}
           allow="autoplay; fullscreen"
           sandbox="allow-scripts allow-forms allow-modals"
@@ -69,7 +77,7 @@ export default async function UniversePage({
     <main style={{ position: "fixed", inset: 0, width: "100vw", height: "100dvh", overflow: "hidden", background: "#210d18" }}>
       <iframe
         title={universe.title || "A Little Surprise"}
-        src={`/surprise-template/index.html?slug=${encodeURIComponent(slug)}`}
+        src={`/surprise-template/index.html?slug=${encodeURIComponent(slug)}${hideButtons ? "&hideButtons=1" : ""}`}
         style={{ display: "block", width: "100%", height: "100%", border: 0 }}
         allow="autoplay"
       />

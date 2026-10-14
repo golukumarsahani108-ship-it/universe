@@ -1,5 +1,6 @@
 import { requireAdmin } from "@/lib/admin-auth";
 import { supabaseAdmin } from "@/lib/supabase/admin";
+import SurpriseDisplayControls from "@/component/admin/SurpriseDisplayControls";
 
 export default async function AdminSettingsPage() {
   const admin = await requireAdmin();
@@ -211,6 +212,22 @@ export default async function AdminSettingsPage() {
 
           </div>
 
+        </section>
+
+
+        {/* SURPRISE DISPLAY CONTROLS */}
+        <section className="admin-settings-card">
+          <div className="admin-settings-card-head">
+            <div>
+              <span className="admin-settings-section-label">
+                USER EXPERIENCE
+              </span>
+              <h2>Surprise Website Controls</h2>
+              <p>Turn off visible action buttons on published surprise websites without deleting them.</p>
+            </div>
+            <div className="admin-settings-card-icon cyan">⚙</div>
+          </div>
+          <SurpriseDisplayControls initialHideButtons={Boolean(settings?.hide_surprise_buttons)} />
         </section>
 
 

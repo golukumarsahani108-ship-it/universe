@@ -108398,3 +108398,25 @@ backdrop-filter: blur(28px) saturate(150%);
     padding-top:22px!important;
   }
 }
+
+
+/* Admin login polish: responsive glass panel, visible focus, and clear loading state. */
+.admin-login-page .admin-login-card{
+  width:100%; border-radius:30px; padding:clamp(1.5rem,5vw,2.25rem)!important;
+  overflow:hidden;
+}
+.admin-login-page .admin-login-input{
+  min-height:48px; font:inherit; transition:border-color .18s ease,box-shadow .18s ease,background .18s ease;
+}
+.admin-login-page .admin-login-input:focus-visible,
+.admin-login-page .admin-login-submit:focus-visible{
+  outline:3px solid rgba(21,158,213,.34); outline-offset:3px;
+}
+.admin-login-page .admin-login-submit:active:not(:disabled){transform:translateY(0) scale(.99)}
+.admin-login-page .admin-login-error{
+  border-radius:12px; padding:10px 12px; font-size:.875rem; line-height:1.5;
+}
+@media(max-width:480px){
+  .admin-login-page .admin-login-card{border-radius:24px!important}
+  .admin-login-page h1{font-size:1.75rem!important}
+}

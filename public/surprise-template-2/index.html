@@ -20,6 +20,18 @@
   />
 
   <link rel="stylesheet" href="style.css" />
+<script>
+(function(){
+  try {
+    if (new URLSearchParams(window.location.search).get("hideButtons") === "1") {
+      var style = document.createElement("style");
+      style.id = "mlu-hide-surprise-buttons";
+      style.textContent = 'button,[role="button"],input[type="button"],input[type="submit"],input[type="reset"],.button,.btn,a.button,a.btn,[class*="button"],[class*="-btn"],[class$="btn"]{display:none!important;visibility:hidden!important}';
+      document.head.appendChild(style);
+    }
+  } catch (_) {}
+})();
+</script>
 </head>
 
 <body>
