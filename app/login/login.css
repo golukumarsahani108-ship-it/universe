@@ -468,7 +468,8 @@
   
   .login-card {
     width: 560px;
-    height: 310px;
+    height: auto;
+    min-height: 390px;
   
     display: flex;
   
@@ -1321,3 +1322,82 @@
       transition-duration: 0.01ms !important;
     }
   }
+
+/* =========================================================
+   GOOGLE SIGN-IN — placed directly below the Login button
+========================================================= */
+.google-divider {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 12px 0 9px;
+  color: rgba(255, 255, 255, 0.38);
+}
+
+.google-divider span {
+  flex: 1;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.google-divider small {
+  font-size: 7px;
+  letter-spacing: 0.12em;
+  white-space: nowrap;
+}
+
+.google-login-button {
+  width: 100%;
+  min-height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  padding: 8px 10px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.96);
+  color: #202124;
+  font: inherit;
+  font-size: 9px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+
+.google-login-button:hover {
+  transform: translateY(-1px);
+  background: #fff;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.22);
+}
+
+.google-login-button:disabled {
+  opacity: 0.6;
+  cursor: wait;
+  transform: none;
+}
+
+.google-logo {
+  width: 14px;
+  height: 14px;
+  flex: 0 0 14px;
+}
+
+@media (max-width: 600px) {
+  .login-card {
+    min-height: 0;
+  }
+
+  .login-form-side {
+    min-height: 0;
+  }
+
+  .form-inner {
+    width: 100%;
+  }
+
+  .google-login-button {
+    min-height: 38px;
+    font-size: 10px;
+  }
+}
